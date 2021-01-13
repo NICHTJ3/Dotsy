@@ -13,6 +13,7 @@
   - [ ] Install a profile/config? (I don't know how the command structure or file
         structure will work with this)
 - [ ] Uninstall
+
   - [ ] Unlink files
   - [ ] Remove directories
   - [ ] Uninstall programs with built in pm
@@ -20,3 +21,11 @@
         neccisary
   - [ ] Uninstall a profile/config? (I don't know how the command structure or file
         structure will work with this)
+
+- Command structure?
+  - `npx dotsy profile -i <profile-name/'s'>`
+  - `npx dotsy profile --uninstall <profile-name/'s'>`
+  - `npx dotsy config -i <config-name/'s>`
+  - `npx dotsy config --uninstall <config-name/'s>`
+  - `npx dotsy config ls`
+  - `npx dotsy profile ls`
