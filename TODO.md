@@ -1,5 +1,10 @@
 # TODO
 
+- [ ] CLI
+  - [ ] Allow for commands
+  - [ ] Allow for command options
+- [ ] Parsing config
+  - [ ] YAML or json?
 - [ ] Installing
   - [ ] Link files
   - [ ] Create directories
