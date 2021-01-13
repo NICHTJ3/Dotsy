@@ -11,7 +11,8 @@
   - [x] Allow for command options
 - [ ] Parsing config
   - [x] YAML or json?
-    - JSON
+    - JSON parsing is inbuilt
+  - [ ] config validation (global,config and profiles )
 - [ ] Installing
   - [ ] Link files
   - [ ] Create directories
