@@ -2,6 +2,10 @@
 
 ## TODO
 
+- [ ] Bootstrapping?
+  - [ ] Create a config
+  - [ ] Create a profile
+  - [ ] dotsy init?
 - [x] CLI
   - [x] Allow for commands
   - [x] Allow for command options
