@@ -2,11 +2,12 @@
 
 ## TODO
 
-- [ ] CLI
-  - [ ] Allow for commands
-  - [ ] Allow for command options
+- [x] CLI
+  - [x] Allow for commands
+  - [x] Allow for command options
 - [ ] Parsing config
-  - [ ] YAML or json?
+  - [x] YAML or json?
+    - JSON
 - [ ] Installing
   - [ ] Link files
   - [ ] Create directories
@@ -15,7 +16,6 @@
   - [ ] Install a profile/config? (I don't know how the command structure or file
         structure will work with this)
 - [ ] Uninstall
-
   - [ ] Unlink files
   - [ ] Remove directories
   - [ ] Uninstall programs with built in pm
@@ -43,8 +43,9 @@
     - config-files/
     - config.json/.yml
 - profiles/
-
   - profile.json/.yml
+- .dotsyrc ( This will hold global options such as the package manager install
+  and uninstall command etc...)
 
 ### test-config.json/.yml
 
