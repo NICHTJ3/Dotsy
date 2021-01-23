@@ -1,10 +1,9 @@
-import {
-  ProfileCommandOptionsType,
-  profileCommandOptions,
-} from '../validators/profile-args';
-
 import { existsSync } from 'fs';
 import fs from 'fs/promises';
+import {
+  configCommandOptions,
+  ConfigCommandOptionsType,
+} from './utils/validators/config-args';
 
 const optsToAction = {
   list,
@@ -12,7 +11,7 @@ const optsToAction = {
   uninstall,
 };
 
-export function handle(opts: ProfileCommandOptionsType) {
+export function handle(opts: ConfigCommandOptionsType) {
   for (const opt of Object.keys(opts)) {
     if (opt in optsToAction) {
       // TODO: Fix typing
@@ -25,15 +24,15 @@ export function handle(opts: ProfileCommandOptionsType) {
 }
 
 export function validate(cmdObj: unknown) {
-  return profileCommandOptions.parse(cmdObj); // Validate command options
+  return configCommandOptions.parse(cmdObj); // Validate command options
 }
 
 export function install(name: string[]) {
-  console.log('Profile to install', name);
+  console.log('Config to install', name);
 }
 
 export function uninstall(name: string) {
-  console.log('Profile to uninstall', name);
+  console.log('Config to uninstall', name);
 }
 
 export async function list() {
