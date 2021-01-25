@@ -6,6 +6,8 @@ export default class Context {
   defaults: any;
 
   constructor(baseDirectory?: string) {
+    // FIXME: How is this going to work? Should it try to be taken from the
+    // current directory  or should it be taken from the rc file
     this.baseDirectory = baseDirectory ?? null;
     this.defaults = {};
   }

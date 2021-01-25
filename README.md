@@ -15,6 +15,12 @@
   - [ ] config validation (global,config and profiles )
 - [ ] Installing
   - [ ] Link files
+    - [ ] Handle linking files
+    - [ ] Handle linking files to directories that don't exist
+    - [ ] Handle globs
+    - [ ] Handle forcing
+    - [ ] Handle re-linking
+    - [ ] Handle relative?
   - [ ] Create directories
   - [ ] Install programs with built in pm
   - [ ] Run shell commands
