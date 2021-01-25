@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { getAbsolutePath, getParentDirectory } from 'src/utils/helpers/path';
 import Context from '../utils/plugins/context';
 import Plugin from '../utils/plugins/plugin';
 
@@ -49,11 +50,15 @@ export default class Link extends Plugin {
    * @param {string} to: The directory or file to link to
    * @memberof Link
    */
-  private link(from: string, to: string) {
-    let success = false;
-    // TODO: Get the relative path to the from file?
-    // TODO: Should the path be taken from an absolute
+  private async link(from: string, to: string) {
+    let success = true;
+    // TODO: Get the absolute path to the from file?
     // TODO: Get default options from config parser?
+
+    // TODO: Use this only if create flag is passed
+    // Creates all parent directories
+    // const parent = getParentDirectory(to)!;
+    // await fs.mkdir(getAbsolutePath(parent), { recursive: true });
 
     fs.symlink(from, to);
     return success;
@@ -67,6 +72,7 @@ export default class Link extends Plugin {
    * @returns {boolean}
    * @memberof Link
    */
+    // TODO: Use this
   private async isLink(file: string): Promise<boolean> {
     const stats = await fs.lstat(file);
     return stats.isSymbolicLink();

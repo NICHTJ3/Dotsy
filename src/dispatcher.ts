@@ -1,7 +1,8 @@
 import fs from 'fs';
 import { getAbsolutePath } from './utils/helpers/path';
 import Context from './utils/plugins/context';
-// TODO: Create seporate class to dispatch tasks for a config/profile
+// TODO: Create seporate class to dispatch tasks for a profile
+// TODO: Once the above is done rename this to config dispatcher
 
 export type Task = {}[];
 
@@ -9,7 +10,8 @@ export default abstract class Dispatcher {
   context: Context;
   only: Array<string> | null;
   skip: Array<string> | null;
-  constructor(base_directory: string, only = null, skip = null) {
+
+  constructor(baseDirectory: string, only = null, skip = null) {
     this.setupContext(baseDirectory);
     this.loadPlugins();
     this.only = only;
@@ -25,9 +27,9 @@ export default abstract class Dispatcher {
   }
 
   //TODO: Types
-  //TODO actually iterate over keys
-  //TODO handle default action
-  //TODO use plugins to process actions
+  //TODO: Actually iterate over keys
+  //TODO: Handle default action
+  //TODO: Use plugins to process actions
   dispatch(tasks: Map<string, string>) {
     let success = true;
     for (const task of tasks) {
@@ -46,4 +48,7 @@ export default abstract class Dispatcher {
   }
 
   // TODO: Create plugin dictionary
+  loadPlugins() {
+    return null;
+  }
 }

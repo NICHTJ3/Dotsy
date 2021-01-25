@@ -8,4 +8,8 @@ export function getAbsolutePath(filepath: string, delim = '/') {
   return path.resolve(filepath);
 }
 
+export function getParentDirectory(filepath: string) {
+  return path.basename(path.dirname(filepath));
+}
+
 export { path };
