@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
-import { globalConfig, GlobalConfigType } from '../validators/global-config';
+import { globalConfig, GlobalConfigType } from './validator';
 
 class Dotsyrc {
   // TODO: Also check for dotsyrc in ~/.config etc

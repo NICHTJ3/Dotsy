@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { config } from '../utils/validators/config';
+import { config } from './validator';
 
 export default class ConfigReader {
   configPath: string;

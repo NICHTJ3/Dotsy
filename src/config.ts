@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import {
   configCommandOptions,
   ConfigCommandOptionsType,
-} from './utils/validators/config-args';
+} from './utils/arg-validators/config';
 
 const optsToAction = {
   list,

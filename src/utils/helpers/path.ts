@@ -7,3 +7,5 @@ export function getAbsolutePath(filepath: string, delim = '/') {
   filepath = filepath.replace(/\~/g, homedir + delim);
   return path.resolve(filepath);
 }
+
+export { path };
