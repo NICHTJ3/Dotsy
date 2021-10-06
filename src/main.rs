@@ -1,16 +1,15 @@
-mod cli;
-
+use dotsy::{
+    cli::{self, Cli},
+    configs::{self, ConfigFile},
+    DotsyResult,
+};
 use std::process;
-
-use cli::Cli;
-use dotsy::DotsyResult;
 use structopt::StructOpt;
 
 fn main() {
     let opt = Cli::from_args();
     match handle_subcommands(opt) {
         Ok(_) => {
-            println!("Done");
             process::exit(0);
         }
         Err(err) => {
@@ -25,14 +24,41 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
         match subcmd {
             cli::CliSubcommand::Init {
                 repo: _,
-                config: _,
-                profile: _,
+                config,
+                profile,
             } => {
-                dotsy::init(dotsy::InitType::Config).unwrap();
+                if config.is_some() {
+                    configs::ConfigConfig::create(config.unwrap().as_str()).unwrap();
+                } else if profile.is_some() {
+                    configs::ProfileConfig::create(profile.unwrap().as_str()).unwrap();
+                } else {
+                    configs::DotsyConfig::create("./.dotsyrc.json").unwrap();
+                }
             }
-            _ => {
-                panic!("Oh no this isn't implemented yet");
+            cli::CliSubcommand::Profile(opts) => {
+                let _config = dotsy::load_rcfile();
+
+                if opts.install.is_some() {
+                    println!("Ye");
+                }
+                if opts.uninstall.is_some() {
+                    println!("Ye");
+                }
             }
+            cli::CliSubcommand::Config(opts) => {
+                let config = dotsy::load_rcfile();
+
+                if opts.install.is_some() {
+                    dotsy::install_configs(opts.install.unwrap(), &config);
+                }
+                if opts.uninstall.is_some() {
+                    println!("Ye");
+                }
+            }
+            cli::CliSubcommand::List {
+                configs: _,
+                profiles: _,
+            } => todo!(),
         }
     }
     Ok(())

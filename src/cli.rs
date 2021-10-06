@@ -5,9 +5,9 @@ use structopt::{clap::AppSettings, StructOpt};
 #[derive(Debug, StructOpt)]
 pub struct ProfileConfigSubCommand {
     #[structopt(short, long)]
-    install: Option<Vec<String>>,
+    pub install: Option<Vec<String>>,
     #[structopt(short, long)]
-    uninstall: Option<Vec<String>>,
+    pub uninstall: Option<Vec<String>>,
 }
 
 #[derive(Debug, StructOpt)]
@@ -23,11 +23,11 @@ pub enum CliSubcommand {
     },
     Init {
         #[structopt(short = "r", long = "repo")]
-        repo: Option<bool>,
-        #[structopt(short = "c", long = "configs")]
-        config: Option<bool>,
-        #[structopt(short = "p", long = "profiles")]
-        profile: Option<bool>,
+        repo: bool,
+        #[structopt(short = "c", long = "config")]
+        config: Option<String>,
+        #[structopt(short = "p", long = "profile")]
+        profile: Option<String>,
     },
 }
 
@@ -37,24 +37,21 @@ pub struct CliOpts {
     #[structopt(short = "v", long = "verbose")]
     pub verbose: bool,
 
-    /// TODO: Set this up
     /// Sets a custom config file.
     ///
     /// DEFAULT PATH is otherwise determined in this order:
     ///
     ///   - $DOTSY_CONFIG_PATH (environment variable if set)
     ///
-    ///   - dotsy.json (in the current directory)
+    ///   - .dotsyrc.json (in the current directory)
     ///
-    ///   - $XDG_CONFIG_HOME/dotsy/config.json
+    ///   - $XDG_CONFIG_HOME/dotsy/dotsyrc.json
     ///
-    ///   - $XDG_CONFIG_HOME/dotsy/config
+    ///   - $XDG_CONFIG_HOME/dotsy/dotsyrc
     ///
-    ///   - $XDG_CONFIG_HOME/dotsy.json
+    ///   - $XDG_CONFIG_HOME/dotsyrc.json
     ///
-    ///   - $HOME/.dotsy.json
-    ///
-    ///   - $HOME/.dotsy
+    ///   - $HOME/.dotsyrc.json
     ///
     #[structopt(short = "c", long = "config-file", env = "DOTSY_CONFIG_PATH")]
     pub path: Option<PathBuf>,

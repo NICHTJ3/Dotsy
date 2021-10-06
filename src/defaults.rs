@@ -1,17 +1,24 @@
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use std::path::PathBuf;
 
-use crate::{configs::DotsyConfig, DotsyResult};
+use crate::{dotsy_err, error::DotsyError, home, xdg_config_home, DotsyResult};
 
-pub fn create_default_dotsy_config(path: &str) -> DotsyResult<()> {
-    let default_config = DotsyConfig::new(Path::new("~/Dotfiles").to_path_buf(), None, None);
+pub fn fallback_path() -> DotsyResult<PathBuf> {
+    let default_config_paths: Vec<Option<PathBuf>> = vec![
+        Some(PathBuf::from("./.dotsyrc.json")),
+        xdg_config_home!("dotsy/dotsyrc.json"),
+        xdg_config_home!("dotsy/dotsyrc"),
+        xdg_config_home!("dotsyrc.json"),
+        home!(".dotsyrc.json"),
+    ];
 
-    let serialized = serde_json::to_string_pretty(&default_config).unwrap();
-
-    let mut file = File::create(path).unwrap();
-
-    file.write_all(serialized.as_bytes()).unwrap();
-
-    Ok(())
+    // Loops for a vector of possible paths and tries to generate config from the first
+    // default path that exists.
+    for config_path in default_config_paths {
+        if let Some(path) = config_path {
+            if path.exists() {
+                return Ok(path);
+            }
+        }
+    }
+    dotsy_err!(DotsyError::NoConfigFile)
 }

@@ -1,26 +1,56 @@
-use std::path::PathBuf;
+use std::{
+    fs::File,
+    io::{BufReader, Write},
+    path::PathBuf,
+};
 
 use serde::{Deserialize, Serialize};
+
+use crate::DotsyResult;
+
+// TODO: Do this stuff better
+
+pub trait ConfigFile {
+    type Output;
+
+    fn load(path_or_name: &str) -> DotsyResult<Self::Output>;
+    fn create(path_or_name: &str) -> DotsyResult<Self::Output>;
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DotsyConfig {
     dotfiles: PathBuf,
+    profiles_dir: PathBuf,
+    configs_dir: PathBuf,
     package_add_command: String,
     package_remove_command: String,
 }
 
-impl DotsyConfig {
-    pub fn new(
-        dotfiles: PathBuf,
-        package_add_command: Option<String>,
-        package_remove_command: Option<String>,
-    ) -> Self {
-        Self {
-            dotfiles,
-            package_add_command: package_add_command.unwrap_or(String::from("brew add {}")),
-            package_remove_command: package_remove_command
-                .unwrap_or(String::from("brew remove {}")),
-        }
+impl ConfigFile for DotsyConfig {
+    type Output = Self;
+
+    fn load(name: &str) -> DotsyResult<Self::Output> {
+        let file = File::open(name).unwrap();
+        let reader = BufReader::new(file);
+
+        let v: Self = serde_json::from_reader(reader).unwrap();
+        Ok(v)
+    }
+
+    fn create(path: &str) -> DotsyResult<Self::Output> {
+        let config = DotsyConfig {
+            dotfiles: PathBuf::from("~/Dotfiles"),
+            package_add_command: "brew add {}".to_string(),
+            package_remove_command: "brew remove {}".to_string(),
+            profiles_dir: PathBuf::from("profiles"),
+            configs_dir: PathBuf::from("configs"),
+        };
+
+        let serialized = serde_json::to_string_pretty(&config).unwrap();
+        let mut file = File::create(path).unwrap();
+
+        file.write_all(serialized.as_bytes()).unwrap();
+        Ok(config)
     }
 }
 
@@ -32,24 +62,26 @@ pub struct Link {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProfileConfig {
-    description: String,
-    links: Vec<Link>,
-    directories: Vec<PathBuf>,
-    packages: Vec<String>,
-    shell: Vec<String>,
-    revert_shell: Vec<String>,
-    configs: Vec<String>,
+    pub description: Option<String>,
+    pub links: Option<Vec<Link>>,
+    pub directories: Option<Vec<PathBuf>>,
+    pub packages: Option<Vec<String>>,
+    pub shell: Option<Vec<String>>,
+    pub revert_shell: Option<Vec<String>>,
+    pub configs: Option<Vec<String>>,
+    parent_dir: PathBuf,
 }
 
 impl ProfileConfig {
     pub fn new(
-        description: String,
-        links: Vec<Link>,
-        directories: Vec<PathBuf>,
-        packages: Vec<String>,
-        shell: Vec<String>,
-        revert_shell: Vec<String>,
-        configs: Vec<String>,
+        description: Option<String>,
+        links: Option<Vec<Link>>,
+        directories: Option<Vec<PathBuf>>,
+        packages: Option<Vec<String>>,
+        shell: Option<Vec<String>>,
+        revert_shell: Option<Vec<String>>,
+        configs: Option<Vec<String>>,
+        parent_dir: PathBuf,
     ) -> Self {
         Self {
             description,
@@ -59,28 +91,64 @@ impl ProfileConfig {
             shell,
             revert_shell,
             configs,
+            parent_dir,
         }
+    }
+
+    fn create_file_name(name: &str) -> String {
+        format!("./{}.profile.json", name)
+    }
+}
+
+impl ConfigFile for ProfileConfig {
+    type Output = Self;
+
+    fn load(name: &str) -> DotsyResult<Self::Output> {
+        let file = File::open(Self::create_file_name(name)).unwrap();
+        let reader = BufReader::new(file);
+
+        let v: Self = serde_json::from_reader(reader).unwrap();
+        Ok(v)
+    }
+
+    fn create(name: &str) -> DotsyResult<Self::Output> {
+        let config = ProfileConfig::new(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            PathBuf::from("~/Dotfiles/configs"),
+        );
+
+        let serialized = serde_json::to_string_pretty(&config).unwrap();
+        let mut file = File::create(Self::create_file_name(name)).unwrap();
+
+        file.write_all(serialized.as_bytes()).unwrap();
+        Ok(config)
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigConfig {
-    description: String,
-    links: Vec<Link>,
-    directories: Vec<PathBuf>,
-    packages: Vec<String>,
-    shell: Vec<String>,
-    revert_shell: Vec<String>,
+    description: Option<String>,
+    links: Option<Vec<Link>>,
+    directories: Option<Vec<PathBuf>>,
+    packages: Option<Vec<String>>,
+    shell: Option<Vec<String>>,
+    revert_shell: Option<Vec<String>>,
 }
 
 impl ConfigConfig {
     pub fn new(
-        description: String,
-        links: Vec<Link>,
-        directories: Vec<PathBuf>,
-        packages: Vec<String>,
-        shell: Vec<String>,
-        revert_shell: Vec<String>,
+        description: Option<String>,
+        links: Option<Vec<Link>>,
+        directories: Option<Vec<PathBuf>>,
+        packages: Option<Vec<String>>,
+        shell: Option<Vec<String>>,
+        revert_shell: Option<Vec<String>>,
     ) -> Self {
         Self {
             description,
@@ -90,5 +158,29 @@ impl ConfigConfig {
             shell,
             revert_shell,
         }
+    }
+    fn create_file_name(name: &str) -> String {
+        format!("./{}.config.json", name)
+    }
+}
+
+impl ConfigFile for ConfigConfig {
+    type Output = Self;
+
+    fn load(name: &str) -> DotsyResult<Self::Output> {
+        let file = File::open(Self::create_file_name(name)).unwrap();
+        let reader = BufReader::new(file);
+
+        let v: Self = serde_json::from_reader(reader).unwrap();
+        Ok(v)
+    }
+
+    fn create(name: &str) -> DotsyResult<Self::Output> {
+        let config = ConfigConfig::new(None, None, None, None, None, None);
+        let serialized = serde_json::to_string_pretty(&config).unwrap();
+        let mut file = File::create(Self::create_file_name(name)).unwrap();
+
+        file.write_all(serialized.as_bytes()).unwrap();
+        Ok(config)
     }
 }
