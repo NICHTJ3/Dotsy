@@ -44,15 +44,15 @@ pub struct CliOpts {
     ///
     ///   - $DOTSY_CONFIG_PATH (environment variable if set)
     ///
-    ///   - dotsy.toml (in the current directory)
+    ///   - dotsy.json (in the current directory)
     ///
-    ///   - $XDG_CONFIG_HOME/dotsy/config.toml
+    ///   - $XDG_CONFIG_HOME/dotsy/config.json
     ///
     ///   - $XDG_CONFIG_HOME/dotsy/config
     ///
-    ///   - $XDG_CONFIG_HOME/dotsy.toml
+    ///   - $XDG_CONFIG_HOME/dotsy.json
     ///
-    ///   - $HOME/.dotsy.toml
+    ///   - $HOME/.dotsy.json
     ///
     ///   - $HOME/.dotsy
     ///

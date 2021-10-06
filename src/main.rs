@@ -28,7 +28,7 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 config: _,
                 profile: _,
             } => {
-                println!("Trying to initialize: Repo , Config , Profile ");
+                dotsy::init(dotsy::InitType::Config).unwrap();
             }
             _ => {
                 panic!("Oh no this isn't implemented yet");
