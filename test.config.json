@@ -1,0 +1,13 @@
+{
+  "description": null,
+  "links": [
+    {
+      "from": "./Cargo.loc",
+      "to": "./test.file"
+    }
+  ],
+  "directories": null,
+  "packages": null,
+  "shell": null,
+  "revert_shell": null
+}

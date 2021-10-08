@@ -3,6 +3,9 @@ pub mod configs;
 pub mod defaults;
 pub mod error;
 pub mod macros;
+pub mod plugins;
+
+use std::path::PathBuf;
 
 use configs::{ConfigFile, DotsyConfig};
 use error::DotsyError;
@@ -17,8 +20,13 @@ pub fn install_configs(configs: Vec<String>, global_config: &DotsyConfig) {
 
 fn install_config(config: String, _global_config: &DotsyConfig) {
     let config = configs::ConfigConfig::load_by_name(&config).unwrap();
-    println!("{:?}", config)
-    // TODO: How do I access the links? They're an optional Vec<Links>?
+    println!("{:?}", config);
+
+    // Link files
+    for link in config.links.unwrap() {
+        plugins::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
+            .unwrap_or_else(|e| eprintln!("{}", e));
+    }
 }
 
 // TODO: Find a way to cache the load of the rcfile for the life of the program

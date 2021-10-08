@@ -56,8 +56,8 @@ impl ConfigFile for DotsyConfig {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Link {
-    from: PathBuf,
-    to: PathBuf,
+    pub from: PathBuf,
+    pub to: PathBuf,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -129,12 +129,12 @@ impl ConfigFile for ProfileConfig {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigConfig {
-    description: Option<String>,
-    links: Option<Vec<Link>>,
-    directories: Option<Vec<PathBuf>>,
-    packages: Option<Vec<String>>,
-    shell: Option<Vec<String>>,
-    revert_shell: Option<Vec<String>>,
+    pub description: Option<String>,
+    pub links: Option<Vec<Link>>,
+    pub directories: Option<Vec<PathBuf>>,
+    pub packages: Option<Vec<String>>,
+    pub shell: Option<Vec<String>>,
+    pub revert_shell: Option<Vec<String>>,
 }
 
 impl ConfigConfig {
