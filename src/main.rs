@@ -3,7 +3,7 @@ use dotsy::{
     configs::{self, ConfigFile},
     DotsyResult,
 };
-use std::process;
+use std::{path::PathBuf, process};
 use structopt::StructOpt;
 
 fn main() {
@@ -24,15 +24,20 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
         match subcmd {
             cli::CliSubcommand::Init {
                 repo: _,
-                config,
-                profile,
+                config: config_name,
+                profile: profile_name,
             } => {
-                if config.is_some() {
-                    configs::ConfigConfig::create(config.unwrap().as_str()).unwrap();
-                } else if profile.is_some() {
-                    configs::ProfileConfig::create(profile.unwrap().as_str()).unwrap();
+                if config_name.is_some() {
+                    // TODO: Cleaner way to create config from config name
+                    let config_name = config_name.unwrap().as_str().to_owned();
+                    let config_filename = configs::ConfigConfig::create_file_name(&config_name);
+                    configs::ConfigConfig::create(PathBuf::from(config_filename)).unwrap();
+                } else if profile_name.is_some() {
+                    let profile_name = profile_name.unwrap().as_str().to_owned();
+                    let profile_filename = configs::ProfileConfig::create_file_name(&profile_name);
+                    configs::ProfileConfig::create(PathBuf::from(profile_filename)).unwrap();
                 } else {
-                    configs::DotsyConfig::create("./.dotsyrc.json").unwrap();
+                    configs::DotsyConfig::create(PathBuf::from("./.dotsyrc.json")).unwrap();
                 }
             }
             cli::CliSubcommand::Profile(opts) => {

@@ -11,10 +11,20 @@ use crate::DotsyResult;
 // TODO: Do this stuff better
 
 pub trait ConfigFile {
-    type Output;
+    fn load(path: PathBuf) -> DotsyResult<Self>
+    where
+        Self: Sized,
+        for<'de> Self: Deserialize<'de>,
+    {
+        let file = File::open(path).unwrap();
+        let reader = BufReader::new(file);
 
-    fn load(path_or_name: &str) -> DotsyResult<Self::Output>;
-    fn create(path_or_name: &str) -> DotsyResult<Self::Output>;
+        let v: Self = serde_json::from_reader(reader).unwrap();
+        Ok(v)
+    }
+    fn create(path: PathBuf) -> DotsyResult<Self>
+    where
+        Self: Sized;
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -27,17 +37,7 @@ pub struct DotsyConfig {
 }
 
 impl ConfigFile for DotsyConfig {
-    type Output = Self;
-
-    fn load(name: &str) -> DotsyResult<Self::Output> {
-        let file = File::open(name).unwrap();
-        let reader = BufReader::new(file);
-
-        let v: Self = serde_json::from_reader(reader).unwrap();
-        Ok(v)
-    }
-
-    fn create(path: &str) -> DotsyResult<Self::Output> {
+    fn create(path: PathBuf) -> DotsyResult<Self> {
         let config = DotsyConfig {
             dotfiles: PathBuf::from("~/Dotfiles"),
             package_add_command: "brew add {}".to_string(),
@@ -95,23 +95,19 @@ impl ProfileConfig {
         }
     }
 
-    fn create_file_name(name: &str) -> String {
+    pub fn create_file_name(name: &str) -> String {
         format!("./{}.profile.json", name)
+    }
+
+    pub fn load_by_name(name: &str) -> DotsyResult<Self> {
+        let file_name = PathBuf::from(Self::create_file_name(name));
+
+        Self::load(file_name)
     }
 }
 
 impl ConfigFile for ProfileConfig {
-    type Output = Self;
-
-    fn load(name: &str) -> DotsyResult<Self::Output> {
-        let file = File::open(Self::create_file_name(name)).unwrap();
-        let reader = BufReader::new(file);
-
-        let v: Self = serde_json::from_reader(reader).unwrap();
-        Ok(v)
-    }
-
-    fn create(name: &str) -> DotsyResult<Self::Output> {
+    fn create(path: PathBuf) -> DotsyResult<Self> {
         let config = ProfileConfig::new(
             None,
             None,
@@ -124,7 +120,7 @@ impl ConfigFile for ProfileConfig {
         );
 
         let serialized = serde_json::to_string_pretty(&config).unwrap();
-        let mut file = File::create(Self::create_file_name(name)).unwrap();
+        let mut file = File::create(path).unwrap();
 
         file.write_all(serialized.as_bytes()).unwrap();
         Ok(config)
@@ -159,26 +155,22 @@ impl ConfigConfig {
             revert_shell,
         }
     }
-    fn create_file_name(name: &str) -> String {
+    pub fn create_file_name(name: &str) -> String {
         format!("./{}.config.json", name)
+    }
+
+    pub fn load_by_name(name: &str) -> DotsyResult<Self> {
+        let file_name = PathBuf::from(Self::create_file_name(name));
+
+        Self::load(file_name)
     }
 }
 
 impl ConfigFile for ConfigConfig {
-    type Output = Self;
-
-    fn load(name: &str) -> DotsyResult<Self::Output> {
-        let file = File::open(Self::create_file_name(name)).unwrap();
-        let reader = BufReader::new(file);
-
-        let v: Self = serde_json::from_reader(reader).unwrap();
-        Ok(v)
-    }
-
-    fn create(name: &str) -> DotsyResult<Self::Output> {
+    fn create(path: PathBuf) -> DotsyResult<Self> {
         let config = ConfigConfig::new(None, None, None, None, None, None);
         let serialized = serde_json::to_string_pretty(&config).unwrap();
-        let mut file = File::create(Self::create_file_name(name)).unwrap();
+        let mut file = File::create(path).unwrap();
 
         file.write_all(serialized.as_bytes()).unwrap();
         Ok(config)
