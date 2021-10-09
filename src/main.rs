@@ -1,8 +1,11 @@
+extern crate glob;
+
 use dotsy::{
     cli::{self, Cli},
     configs::{self, ConfigFile},
     DotsyResult,
 };
+use glob::glob;
 use std::{path::PathBuf, process};
 use structopt::StructOpt;
 
@@ -60,10 +63,25 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                     println!("Ye");
                 }
             }
-            cli::CliSubcommand::List {
-                configs: _,
-                profiles: _,
-            } => todo!(),
+            cli::CliSubcommand::List { configs, profiles } => {
+                // TODO: Only show names not full file path
+                if configs {
+                    glob("./*.config.json")
+                        .expect("Failed to read glob pattern")
+                        .into_iter()
+                        .for_each(|e| {
+                            println!("{}", e.unwrap().display());
+                        });
+                }
+                if profiles {
+                    glob("./*.profile.json")
+                        .expect("Failed to read glob pattern")
+                        .into_iter()
+                        .for_each(|e| {
+                            println!("{}", e.unwrap().display());
+                        });
+                }
+            }
         }
     }
     Ok(())

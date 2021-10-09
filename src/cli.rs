@@ -17,9 +17,9 @@ pub enum CliSubcommand {
     #[structopt(alias = "ls")]
     List {
         #[structopt(short = "c", long = "configs")]
-        configs: Option<bool>,
+        configs: bool,
         #[structopt(short = "p", long = "profiles")]
-        profiles: Option<bool>,
+        profiles: bool,
     },
     Init {
         #[structopt(short = "r", long = "repo")]
