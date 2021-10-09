@@ -41,10 +41,10 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 }
             }
             cli::CliSubcommand::Profile(opts) => {
-                let _config = dotsy::load_rcfile();
+                let config = dotsy::load_rcfile();
 
                 if opts.install.is_some() {
-                    println!("Ye");
+                    dotsy::install_profiles(opts.install.unwrap(), &config);
                 }
                 if opts.uninstall.is_some() {
                     println!("Ye");

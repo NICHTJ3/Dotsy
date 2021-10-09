@@ -1,4 +1,4 @@
-use std::{os, path::PathBuf};
+use std::{fs, os, path::PathBuf};
 
 use crate::{dotsy_err, error::DotsyError, DotsyResult};
 
@@ -23,5 +23,23 @@ pub fn link_file(from: PathBuf, to: PathBuf) -> DotsyResult<()> {
             to: to_path_as_string,
         });
     };
+    return Ok(());
+}
+
+pub fn unlink_file(file: PathBuf) -> DotsyResult<()> {
+    let metadata = fs::symlink_metadata(&file).unwrap();
+    let file_type = metadata.file_type();
+
+    let is_symlink = file_type.is_symlink();
+    if !is_symlink {
+        dotsy_err!(DotsyError::TODO);
+    }
+
+    if file_type.is_dir() {
+        fs::remove_file(&file).unwrap()
+    } else {
+        fs::remove_file(&file).unwrap()
+    }
+
     return Ok(());
 }
