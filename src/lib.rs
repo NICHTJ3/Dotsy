@@ -22,10 +22,16 @@ fn install_config(config: String, _global_config: &DotsyConfig) {
     let config = configs::ConfigConfig::load_by_name(&config).unwrap();
     println!("{:?}", config);
 
+    // TODO: Extract this logic
     // Link files
     for link in config.links.unwrap() {
         plugins::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
             .unwrap_or_else(|e| eprintln!("{}", e));
+    }
+
+    // Run scripts
+    for script in config.shell.unwrap() {
+        plugins::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
     }
 }
 
