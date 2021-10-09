@@ -6,9 +6,10 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::DotsyResult;
+use crate::{dotsy_err, error::DotsyError, DotsyResult};
 
 // TODO: Do this stuff better
+// - A lot of the config/profile functionallity is shared (should it be a trait?)
 
 pub trait ConfigFile {
     fn load(path: PathBuf) -> DotsyResult<Self>
@@ -16,7 +17,13 @@ pub trait ConfigFile {
         Self: Sized,
         for<'de> Self: Deserialize<'de>,
     {
-        let file = File::open(path).unwrap();
+        let file = {
+            let this = File::open(path);
+            match this {
+                Ok(t) => t,
+                Err(..) => dotsy_err!(DotsyError::TODO),
+            }
+        };
         let reader = BufReader::new(file);
 
         let v: Self = serde_json::from_reader(reader).unwrap();
