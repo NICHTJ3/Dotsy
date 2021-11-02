@@ -3,7 +3,7 @@ pub mod configs;
 pub mod defaults;
 pub mod error;
 pub mod macros;
-pub mod plugins;
+pub mod handlers;
 
 use std::path::PathBuf;
 
@@ -39,12 +39,12 @@ fn uninstall_config(config: String, _global_config: &DotsyConfig) {
 
     // Unlink files
     for link in config.links.unwrap_or_default() {
-        plugins::link::unlink_file(PathBuf::from(link.from)).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(PathBuf::from(link.from)).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run cleanup scripts
     for script in config.revert_shell.unwrap_or_default() {
-        plugins::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
     }
 }
 
@@ -62,18 +62,18 @@ fn install_config(config: String, _global_config: &DotsyConfig) {
     // TODO: Extract this logic
     // Link files
     for link in config.links.unwrap_or_default() {
-        plugins::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
+        handlers::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
             .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run scripts
     for script in config.shell.unwrap_or_default() {
-        plugins::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Make directories
     for dir in config.directories.unwrap_or_default() {
-        plugins::files::create_dir(dir).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::files::create_dir(dir).unwrap_or_else(|e| eprintln!("{}", e));
     }
 }
 
@@ -95,12 +95,12 @@ fn uninstall_profile(profile: String, _global_config: &DotsyConfig) {
 
     // Unlink files
     for link in profile.links.unwrap_or_default() {
-        plugins::link::unlink_file(PathBuf::from(link.from)).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(PathBuf::from(link.from)).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run cleanup scripts
     for script in profile.revert_shell.unwrap_or_default() {
-        plugins::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Uninstall configs
@@ -116,18 +116,18 @@ fn install_profile(profile: String, global_config: &DotsyConfig) {
     // TODO: Extract this logic
     // Link files
     for link in profile.links.unwrap_or_default() {
-        plugins::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
+        handlers::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
             .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Make directories
     for dir in profile.directories.unwrap_or_default() {
-        plugins::files::create_dir(dir).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::files::create_dir(dir).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run scripts
     for script in profile.shell.unwrap_or_default() {
-        plugins::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Install configs
