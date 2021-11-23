@@ -8,6 +8,8 @@ pub struct ProfileConfigSubCommand {
     pub install: Option<Vec<String>>,
     #[structopt(short, long)]
     pub uninstall: Option<Vec<String>>,
+    #[structopt(short, long)]
+    pub validate: Option<Vec<String>>,
 }
 
 #[derive(Debug, StructOpt)]

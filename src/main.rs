@@ -52,6 +52,9 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 if opts.uninstall.is_some() {
                     println!("Ye");
                 }
+                if opts.validate.is_some() {
+                    println!("Ye");
+                }
             }
             cli::CliSubcommand::Config(opts) => {
                 let config = dotsy::load_rcfile();
@@ -62,24 +65,33 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 if opts.uninstall.is_some() {
                     println!("Ye");
                 }
+                if opts.validate.is_some() {
+                    println!("Ye");
+                }
             }
             cli::CliSubcommand::List { configs, profiles } => {
                 // TODO: Only show names not full file path
-                if configs {
-                    glob("./*.config.json")
-                        .expect("Failed to read glob pattern")
-                        .into_iter()
-                        .for_each(|e| {
-                            println!("{}", e.unwrap().display());
+                if configs || !profiles {
+                    let configs = glob("./*.config.json").expect("Failed to read glob pattern");
+                    let mut configs = configs.into_iter().peekable();
+                    if configs.peek().is_some() {
+                        println!("Available Configs to install");
+                        configs.for_each(|e| {
+                            println!(" - {}", e.unwrap().display());
                         });
+                        println!();
+                    }
                 }
-                if profiles {
-                    glob("./*.profile.json")
-                        .expect("Failed to read glob pattern")
-                        .into_iter()
-                        .for_each(|e| {
-                            println!("{}", e.unwrap().display());
+                if profiles || !configs {
+                    let profiles = glob("./*.profile.json").expect("Failed to read glob pattern");
+                    let mut profiles = profiles.into_iter().peekable();
+                    if profiles.peek().is_some() {
+                        println!("Available Profiles to install");
+                        profiles.for_each(|e| {
+                            println!(" - {}", e.unwrap().display());
                         });
+                        println!();
+                    }
                 }
             }
         }
