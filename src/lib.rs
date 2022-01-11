@@ -2,8 +2,8 @@ pub mod cli;
 pub mod configs;
 pub mod defaults;
 pub mod error;
-pub mod macros;
 pub mod handlers;
+pub mod macros;
 
 use std::path::PathBuf;
 
@@ -26,11 +26,11 @@ pub fn uninstall_configs(configs: Vec<String>, global_config: &DotsyConfig) {
     }
 }
 
-fn uninstall_config(config: String, _global_config: &DotsyConfig) {
+fn uninstall_config(config: String, global_config: &DotsyConfig) {
     println!("Attempting to uninstall config: {}", config);
 
     let config = {
-        let this = configs::ConfigConfig::load_by_name(&config);
+        let this = configs::ConfigConfig::load_by_name(&config, &global_config);
         match this {
             Ok(t) => t,
             Err(e) => return eprintln!("{}", e),
@@ -39,7 +39,8 @@ fn uninstall_config(config: String, _global_config: &DotsyConfig) {
 
     // Unlink files
     for link in config.links.unwrap_or_default() {
-        handlers::link::unlink_file(PathBuf::from(link.from)).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(PathBuf::from(link.from))
+            .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run cleanup scripts
@@ -48,11 +49,11 @@ fn uninstall_config(config: String, _global_config: &DotsyConfig) {
     }
 }
 
-fn install_config(config: String, _global_config: &DotsyConfig) {
+fn install_config(config: String, global_config: &DotsyConfig) {
     println!("Attempting to install config: {}", config);
 
     let config = {
-        let this = configs::ConfigConfig::load_by_name(&config);
+        let this = configs::ConfigConfig::load_by_name(&config, &global_config);
         match this {
             Ok(t) => t,
             Err(e) => return eprintln!("{}", e),
@@ -89,13 +90,14 @@ pub fn uninstall_profiles(profiles: Vec<String>, global_config: &DotsyConfig) {
     }
 }
 
-fn uninstall_profile(profile: String, _global_config: &DotsyConfig) {
+fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
     println!("Attempting to uninstall profile: {}", profile);
-    let profile = configs::ProfileConfig::load_by_name(&profile).unwrap();
+    let profile = configs::ProfileConfig::load_by_name(&profile, global_config).unwrap();
 
     // Unlink files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::unlink_file(PathBuf::from(link.from)).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(PathBuf::from(link.from))
+            .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run cleanup scripts
@@ -105,13 +107,13 @@ fn uninstall_profile(profile: String, _global_config: &DotsyConfig) {
 
     // Uninstall configs
     for config in profile.configs.unwrap_or_default() {
-        uninstall_config(config, _global_config);
+        uninstall_config(config, global_config);
     }
 }
 
 fn install_profile(profile: String, global_config: &DotsyConfig) {
     println!("Attempting to install profile: {}", profile);
-    let profile = configs::ProfileConfig::load_by_name(&profile).unwrap();
+    let profile = configs::ProfileConfig::load_by_name(&profile, global_config).unwrap();
 
     // TODO: Extract this logic
     // Link files

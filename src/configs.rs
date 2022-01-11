@@ -10,6 +10,7 @@ use crate::{dotsy_err, error::DotsyError, DotsyResult};
 
 // TODO: Do this stuff better
 // - A lot of the config/profile functionallity is shared (should it be a trait?)
+// - The paths for creation etc should be taken from the dotsyrc
 
 pub trait ConfigFile {
     fn load(path: PathBuf) -> DotsyResult<Self>
@@ -36,11 +37,11 @@ pub trait ConfigFile {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DotsyConfig {
-    dotfiles: PathBuf,
-    profiles_dir: PathBuf,
-    configs_dir: PathBuf,
-    package_add_command: String,
-    package_remove_command: String,
+    pub dotfiles: PathBuf,
+    pub profiles_dir: PathBuf,
+    pub configs_dir: PathBuf,
+    pub package_add_command: String,
+    pub package_remove_command: String,
 }
 
 impl ConfigFile for DotsyConfig {
@@ -106,8 +107,9 @@ impl ProfileConfig {
         format!("./{}.profile.json", name)
     }
 
-    pub fn load_by_name(name: &str) -> DotsyResult<Self> {
-        let file_name = PathBuf::from(Self::create_file_name(name));
+    pub fn load_by_name(name: &str, global_config: &DotsyConfig) -> DotsyResult<Self> {
+        let profiles_dir = PathBuf::from(&global_config.dotfiles).join(&global_config.profiles_dir);
+        let file_name = profiles_dir.join(Self::create_file_name(name));
 
         Self::load(file_name)
     }
@@ -166,8 +168,9 @@ impl ConfigConfig {
         format!("./{}.config.json", name)
     }
 
-    pub fn load_by_name(name: &str) -> DotsyResult<Self> {
-        let file_name = PathBuf::from(Self::create_file_name(name));
+    pub fn load_by_name(name: &str, global_config: &DotsyConfig) -> DotsyResult<Self> {
+        let configs_dir = PathBuf::from(&global_config.dotfiles).join(&global_config.configs_dir);
+        let file_name = configs_dir.join(Self::create_file_name(name));
 
         Self::load(file_name)
     }
