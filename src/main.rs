@@ -71,27 +71,51 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
             }
             cli::CliSubcommand::List { configs, profiles } => {
                 // TODO: Only show names not full file path
-                if configs || !profiles {
-                    let configs = glob("./*.config.json").expect("Failed to read glob pattern");
-                    let mut configs = configs.into_iter().peekable();
-                    if configs.peek().is_some() {
-                        println!("Available Configs to install");
-                        configs.for_each(|e| {
-                            println!(" - {}", e.unwrap().display());
-                        });
-                        println!();
-                    }
-                }
-                if profiles || !configs {
-                    let profiles = glob("./*.profile.json").expect("Failed to read glob pattern");
-                    let mut profiles = profiles.into_iter().peekable();
-                    if profiles.peek().is_some() {
-                        println!("Available Profiles to install");
-                        profiles.for_each(|e| {
-                            println!(" - {}", e.unwrap().display());
-                        });
-                        println!();
-                    }
+                // TODO: Break out into functions
+                let config = dotsy::load_rcfile();
+                let configs_found = glob(
+                    &config
+                        .dotfiles
+                        .join(&config.configs_dir)
+                        .join("./*.config.json")
+                        .into_os_string()
+                        .to_str()
+                        .unwrap(),
+                )
+                .expect("Failed to read glob pattern");
+
+                let profiles_found = glob(
+                    &config
+                        .dotfiles
+                        .join(&config.profiles_dir)
+                        .join("./*.profile.json")
+                        .into_os_string()
+                        .to_str()
+                        .unwrap(),
+                )
+                .expect("Failed to read glob pattern");
+
+                let mut configs_peekable = configs_found.into_iter().peekable();
+                let mut profiles_peekable = profiles_found.into_iter().peekable();
+
+                let have_configs = configs_peekable.peek().is_some();
+                let have_profiles = profiles_peekable.peek().is_some();
+
+                if configs || !profiles && have_configs {
+                    println!("Available Configs to install");
+                    configs_peekable.for_each(|e| {
+                        println!(" - {}", e.unwrap().display());
+                    });
+                    println!();
+                } else if have_profiles {
+                    println!("Available Profiles to install");
+                    profiles_peekable.for_each(|e| {
+                        println!(" - {}", e.unwrap().display());
+                    });
+                    println!();
+                } else {
+                    // TODO: Should this be done with error handling
+                    println!("No configs or profiles found to install!!");
                 }
             }
         }
