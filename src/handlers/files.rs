@@ -6,7 +6,7 @@ use crate::{dotsy_err, error::DotsyError, DotsyResult};
 // just log "Could not undo `<module name>` you may want to look at this yourself!!"
 // TODO: Might need more work
 pub fn create_dir(dir: PathBuf) -> DotsyResult<()> {
-    if dir.is_file() || dir.is_dir() {
+    if dir.exists() && (dir.is_file() || dir.is_dir()) {
         dotsy_err!(DotsyError::TODO);
     }
 
