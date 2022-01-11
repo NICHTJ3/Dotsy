@@ -85,7 +85,7 @@ fn install_config(config: String, global_config: &DotsyConfig) {
 
     // Make directories
     for dir in config.directories.unwrap_or_default() {
-        handlers::files::create_dir(dir).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| eprintln!("{}", e));
     }
 }
 
