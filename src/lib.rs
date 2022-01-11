@@ -15,6 +15,13 @@ pub type DotsyResult<T, E = DotsyError> = ::std::result::Result<T, E>;
 
 // FIXME: This stuff should be handled better (there is a lot of duplicate logic
 
+fn absolute(base: PathBuf) -> PathBuf {
+    match shellexpand::tilde(&base.into_os_string().to_str().unwrap()) {
+        std::borrow::Cow::Borrowed(s) => PathBuf::from(s),
+        std::borrow::Cow::Owned(s) => PathBuf::from(s),
+    }
+}
+
 pub fn install_configs(configs: Vec<String>, global_config: &DotsyConfig) {
     for config in configs {
         install_config(config, global_config)
@@ -40,7 +47,7 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
 
     // Unlink files
     for link in config.links.unwrap_or_default() {
-        handlers::link::unlink_file(PathBuf::from(link.from))
+        handlers::link::unlink_file(absolute(PathBuf::from(link.from)))
             .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
@@ -64,8 +71,11 @@ fn install_config(config: String, global_config: &DotsyConfig) {
     // TODO: Extract this logic
     // Link files
     for link in config.links.unwrap_or_default() {
-        handlers::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
-            .unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::link_file(
+            absolute(PathBuf::from(link.from)),
+            absolute(PathBuf::from(link.to)),
+        )
+        .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run scripts
@@ -97,7 +107,7 @@ fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
 
     // Unlink files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::unlink_file(PathBuf::from(link.from))
+        handlers::link::unlink_file(absolute(PathBuf::from(link.from)))
             .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
@@ -119,13 +129,16 @@ fn install_profile(profile: String, global_config: &DotsyConfig) {
     // TODO: Extract this logic
     // Link files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::link_file(PathBuf::from(link.from), PathBuf::from(link.to))
-            .unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::link_file(
+            absolute(PathBuf::from(link.from)),
+            absolute(PathBuf::from(link.to)),
+        )
+        .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Make directories
     for dir in profile.directories.unwrap_or_default() {
-        handlers::files::create_dir(dir).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run scripts
@@ -142,11 +155,7 @@ pub fn load_rcfile() -> DotsyResult<DotsyConfig> {
     let rcfile_path = defaults::fallback_path().unwrap();
 
     let mut config = configs::DotsyConfig::load(rcfile_path).unwrap();
-    config.dotfiles = match shellexpand::tilde(&config.dotfiles.into_os_string().to_str().unwrap())
-    {
-        std::borrow::Cow::Borrowed(s) => PathBuf::from(s),
-        std::borrow::Cow::Owned(s) => PathBuf::from(s),
-    };
+    config.dotfiles = absolute(config.dotfiles);
 
     return Ok(config);
 }
