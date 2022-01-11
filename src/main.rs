@@ -23,6 +23,7 @@ fn main() {
 }
 
 fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
+    let config = dotsy::load_rcfile().unwrap();
     if let Some(subcmd) = opt.cmd {
         match subcmd {
             cli::CliSubcommand::Init {
@@ -44,8 +45,6 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 }
             }
             cli::CliSubcommand::Profile(opts) => {
-                let config = dotsy::load_rcfile();
-
                 if opts.install.is_some() {
                     dotsy::install_profiles(opts.install.unwrap(), &config);
                 }
@@ -57,8 +56,6 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 }
             }
             cli::CliSubcommand::Config(opts) => {
-                let config = dotsy::load_rcfile();
-
                 if opts.install.is_some() {
                     dotsy::install_configs(opts.install.unwrap(), &config);
                 }
@@ -72,12 +69,21 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
             cli::CliSubcommand::List { configs, profiles } => {
                 // TODO: Only show names not full file path
                 // TODO: Break out into functions
-                let config = dotsy::load_rcfile();
+                println!(
+                    "{:?}",
+                    &config
+                        .dotfiles
+                        .join(&config.configs_dir)
+                        .join("*.config.json")
+                        .into_os_string()
+                        .to_str()
+                        .unwrap(),
+                );
                 let configs_found = glob(
                     &config
                         .dotfiles
                         .join(&config.configs_dir)
-                        .join("./*.config.json")
+                        .join("*.config.json")
                         .into_os_string()
                         .to_str()
                         .unwrap(),
@@ -88,7 +94,7 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                     &config
                         .dotfiles
                         .join(&config.profiles_dir)
-                        .join("./*.profile.json")
+                        .join("*.profile.json")
                         .into_os_string()
                         .to_str()
                         .unwrap(),

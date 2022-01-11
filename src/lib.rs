@@ -9,6 +9,7 @@ use std::path::PathBuf;
 
 use configs::{ConfigFile, DotsyConfig};
 use error::DotsyError;
+extern crate shellexpand;
 
 pub type DotsyResult<T, E = DotsyError> = ::std::result::Result<T, E>;
 
@@ -137,10 +138,15 @@ fn install_profile(profile: String, global_config: &DotsyConfig) {
 }
 
 // TODO: Find a way to cache the load of the rcfile for the life of the program
-pub fn load_rcfile() -> DotsyConfig {
+pub fn load_rcfile() -> DotsyResult<DotsyConfig> {
     let rcfile_path = defaults::fallback_path().unwrap();
 
-    let config = configs::DotsyConfig::load(rcfile_path).unwrap();
+    let mut config = configs::DotsyConfig::load(rcfile_path).unwrap();
+    config.dotfiles = match shellexpand::tilde(&config.dotfiles.into_os_string().to_str().unwrap())
+    {
+        std::borrow::Cow::Borrowed(s) => PathBuf::from(s),
+        std::borrow::Cow::Owned(s) => PathBuf::from(s),
+    };
 
-    return config;
+    return Ok(config);
 }
