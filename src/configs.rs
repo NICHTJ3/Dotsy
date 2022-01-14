@@ -66,6 +66,7 @@ impl ConfigFile for DotsyConfig {
 pub struct Link {
     pub from: PathBuf,
     pub to: PathBuf,
+    pub glob: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

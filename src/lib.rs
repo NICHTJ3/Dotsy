@@ -80,7 +80,7 @@ fn install_config(config: String, global_config: &DotsyConfig) {
                     .join(link.from),
             ),
             absolute(link.to),
-            true,
+            link.glob,
         )
         .unwrap_or_else(|e| eprintln!("{}", e));
     }
@@ -139,7 +139,7 @@ fn install_profile(profile: String, global_config: &DotsyConfig) {
         handlers::link::link_file(
             absolute(PathBuf::from(link.from)),
             absolute(PathBuf::from(link.to)),
-            true,
+            link.glob,
         )
         .unwrap_or_else(|e| eprintln!("{}", e));
     }
