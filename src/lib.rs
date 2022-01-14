@@ -47,7 +47,7 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
 
     // Unlink files
     for link in config.links.unwrap_or_default() {
-        handlers::link::unlink_file(absolute(PathBuf::from(link.from)))
+        handlers::link::unlink_file(&absolute(PathBuf::from(link.to)))
             .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
@@ -70,10 +70,17 @@ fn install_config(config: String, global_config: &DotsyConfig) {
 
     // TODO: Extract this logic
     // Link files
+    // TODO: I need to work more on paths logic
     for link in config.links.unwrap_or_default() {
         handlers::link::link_file(
-            absolute(PathBuf::from(link.from)),
-            absolute(PathBuf::from(link.to)),
+            absolute(
+                global_config
+                    .dotfiles
+                    .join(&global_config.configs_dir)
+                    .join(link.from),
+            ),
+            absolute(link.to),
+            true,
         )
         .unwrap_or_else(|e| eprintln!("{}", e));
     }
@@ -107,7 +114,7 @@ fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
 
     // Unlink files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::unlink_file(absolute(PathBuf::from(link.from)))
+        handlers::link::unlink_file(&absolute(PathBuf::from(link.from)))
             .unwrap_or_else(|e| eprintln!("{}", e));
     }
 
@@ -132,6 +139,7 @@ fn install_profile(profile: String, global_config: &DotsyConfig) {
         handlers::link::link_file(
             absolute(PathBuf::from(link.from)),
             absolute(PathBuf::from(link.to)),
+            true,
         )
         .unwrap_or_else(|e| eprintln!("{}", e));
     }

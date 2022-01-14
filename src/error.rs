@@ -7,6 +7,8 @@ pub enum DotsyError {
     TODO,
     #[snafu(display("Error: Failed to run shell command"))]
     FailedToRunCommand,
+    #[snafu(display("Error: Failed to unlink symlink {link}",link=link))]
+    Unlink { link: String },
     #[snafu(display("Error: config file was not found"))]
     NoConfigFile,
     #[snafu(display(
