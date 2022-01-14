@@ -5,6 +5,8 @@ use snafu::Snafu;
 pub enum DotsyError {
     #[snafu(display("Error: I need an error message for this case"))]
     TODO,
+    #[snafu(display("Error: Failed to run shell command"))]
+    FailedToRunCommand,
     #[snafu(display("Error: config file was not found"))]
     NoConfigFile,
     #[snafu(display(

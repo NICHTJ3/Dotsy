@@ -8,13 +8,13 @@ pub fn run_script(script: &str) -> DotsyResult<()> {
         let this = command.stdout(Stdio::inherit()).spawn();
         match this {
             Ok(t) => t,
-            Err(..) => dotsy_err!(DotsyError::TODO),
+            Err(..) => dotsy_err!(DotsyError::FailedToRunCommand),
         }
     };
 
     match command.wait() {
         Ok(t) => t,
-        Err(..) => dotsy_err!(DotsyError::TODO),
+        Err(..) => dotsy_err!(DotsyError::FailedToRunCommand),
     };
 
     Ok(())
