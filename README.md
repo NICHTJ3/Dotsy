@@ -1,41 +1,38 @@
 # Dotsy
 
-## TODO
+A Huge WIP... Infact most of it doesn't work so don't bother downloading yet 😂 It'll get there eventually 🤦
 
-- [X] Bootstrapping?
-  - [X] Create a config
-  - [X] Create a profile
-  - [X] dotsy init?
-- [x] CLI
-  - [x] Allow for commands
-  - [x] Allow for command options
-- [ ] Parsing config
-  - [x] YAML or json?
-    - JSON parsing is inbuilt
-  - [ ] config validation (global,config and profiles )
-- [X] Installing
-  - [X] Link files
-  - [X] Create directories
-  - [X] Install programs with built in pm
-  - [X] Run shell commands
-  - [X] Install a profile/config? (I don't know how the command structure or file
-        structure will work with this)
-- [X] Uninstall?
-  - [X] Unlink files
-  - [X] Uninstall programs with built in pm
-  - [X] Allow for custom uninstall files to run the reverse of shell commands if
-        neccisary
-  - [X] Uninstall a profile/config? (I don't know how the command structure or file
-        structure will work with this)
+The idea behind this was to be able to manage and reinstall a config or profile from where ever you were in the file tree. For example
+```sh
+ls ~/
+> ~/Dotfiles
+> ~/dev
+pwd
+> ~/dev/supercool-project/
+
+dotsy config -i neovim
+# ^ This would install your neovim config without moving you
+# out of the directory or context you're currently in (i've felt this is useful 
+# when I break things)
+```
+
+Getting started on a new machine would theoretically be as simple as running this after cloning your dotfiles
+```sh
+cargo install dotsy
+dotsy init
+# ^ After this you would have to fill in the config file with the location 
+# of your dotfiles but this step could be skipped if you have a .dotsyrc in your dotfiles repo
+dotsy profile -i <name of profile to install>
+```
 
 ## Planning
 
 ### Command structure?
 
 - `dotsy profile -i <profile-name/'s'>`
-- `dotsy profile --uninstall <profile-name/'s'>`
+- `dotsy profile -u <profile-name/'s'>`
 - `dotsy config -i <config-name/'s>`
-- `dotsy config --uninstall <config-name/'s>`
+- `dotsy config -u <config-name/'s>`
 - `dotsy config ls`
 - `dotsy profile ls`
 
@@ -45,13 +42,13 @@
 - configs/
   - config/
     - config-files/
-    - config.json/.yml
+    - config.json
 - profiles/
-  - profile.json/.yml
+  - profile.json
 - .dotsyrc ( This will hold global options such as the package manager install
   and uninstall command etc...)
 
-### test-config.json/.yml
+### test-config.json
 
 Everything will be optional
 
@@ -66,7 +63,7 @@ Everything will be optional
 }
 ```
 
-### profile.json/.yml example
+### profile.json example
 
 Everything but configs will be optional
 
