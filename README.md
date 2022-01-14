@@ -13,18 +13,17 @@
   - [x] YAML or json?
     - JSON parsing is inbuilt
   - [ ] config validation (global,config and profiles )
-- [ ] Installing
+- [X] Installing
   - [X] Link files
-  - [ ] Create directories
-  - [ ] Install programs with built in pm
+  - [X] Create directories
+  - [X] Install programs with built in pm
   - [X] Run shell commands
   - [X] Install a profile/config? (I don't know how the command structure or file
         structure will work with this)
-- [ ] Uninstall
+- [X] Uninstall?
   - [X] Unlink files
-  - [ ] Remove directories
-  - [ ] Uninstall programs with built in pm
-  - [ ] Allow for custom uninstall files to run the reverse of shell commands if
+  - [X] Uninstall programs with built in pm
+  - [X] Allow for custom uninstall files to run the reverse of shell commands if
         neccisary
   - [X] Uninstall a profile/config? (I don't know how the command structure or file
         structure will work with this)
@@ -33,12 +32,12 @@
 
 ### Command structure?
 
-- `npx dotsy profile -i <profile-name/'s'>`
-- `npx dotsy profile --uninstall <profile-name/'s'>`
-- `npx dotsy config -i <config-name/'s>`
-- `npx dotsy config --uninstall <config-name/'s>`
-- `npx dotsy config ls`
-- `npx dotsy profile ls`
+- `dotsy profile -i <profile-name/'s'>`
+- `dotsy profile --uninstall <profile-name/'s'>`
+- `dotsy config -i <config-name/'s>`
+- `dotsy config --uninstall <config-name/'s>`
+- `dotsy config ls`
+- `dotsy profile ls`
 
 ### File structure
 
