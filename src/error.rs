@@ -7,11 +7,15 @@ pub enum DotsyError {
     TODO,
     #[snafu(display("Error: config file was not found"))]
     NoConfigFile,
-    // TODO: Show the file names
     #[snafu(display(
         "Error: we had some trouble linking files please check these paths: {from}, {to}",
         from=from,
         to=to
     ))]
     CouldntCreateSymLink { from: String, to: String },
+    #[snafu(display(
+        "Error: we had some trouble the file or directory please check this path doesn't already exist: {file}",
+        file=file
+    ))]
+    FileAlreadyExists { file: String },
 }
