@@ -38,13 +38,12 @@ dotsy profile -i <name of profile to install>
 
 ### File structure
 
-- dotsy/
 - configs/
   - config/
-    - config-files/
-    - config.json
+    - <name>/ < files relating to the config would live under here
+    - <name>.json
 - profiles/
-  - profile.json
+  - <name>.json
 - .dotsyrc ( This will hold global options such as the package manager install
   and uninstall command etc...)
 
