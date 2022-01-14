@@ -6,11 +6,10 @@ use crate::{dotsy_warn, DotsyResult};
 // just log "Could not undo `<module name>` you may want to look at this yourself!!"
 // TODO: Might need more work
 pub fn create_dir(dir: PathBuf) -> DotsyResult<()> {
+    println!("Attempting to create directory: {}", &dir.to_string_lossy());
     if dir.exists() && (dir.is_file() || dir.is_dir()) {
-        dotsy_warn!(
-            "Directory `{dir}` already exists skipping creation...",
-            dir = dir.clone().to_string_lossy()
-        );
+        dotsy_warn!("Directory already exists skipping creation...");
+        return Ok(());
     }
 
     fs::create_dir_all(dir).unwrap();
