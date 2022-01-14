@@ -49,7 +49,7 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                     dotsy::install_profiles(opts.install.unwrap(), &config);
                 }
                 if opts.uninstall.is_some() {
-                    println!("Ye");
+                    dotsy::uninstall_profiles(opts.uninstall.unwrap(), &config);
                 }
                 if opts.validate.is_some() {
                     println!("Ye");
@@ -60,7 +60,7 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                     dotsy::install_configs(opts.install.unwrap(), &config);
                 }
                 if opts.uninstall.is_some() {
-                    println!("Ye");
+                    dotsy::uninstall_configs(opts.uninstall.unwrap(), &config);
                 }
                 if opts.validate.is_some() {
                     println!("Ye");
