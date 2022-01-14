@@ -17,6 +17,15 @@ macro_rules! xdg_config_home {
     };
 }
 
+/// macro to log a warning to the user
+#[macro_export]
+macro_rules! dotsy_warn {
+    ($($arg:tt)+) => (
+        print!("WARN: ");
+        println!($($arg)+)
+    )
+}
+
 /// macro to return an absolute path base on the relative_path from $HOME
 #[macro_export]
 macro_rules! home {
