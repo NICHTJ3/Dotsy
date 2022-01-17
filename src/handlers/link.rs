@@ -57,8 +57,8 @@ pub fn link_file(from: PathBuf, to: PathBuf, should_glob: bool) -> DotsyResult<(
     }
 }
 
-// TODO: This should handle globs
 pub fn unlink_file<'a>(file: &'a PathBuf, should_glob: bool) -> DotsyResult<()> {
+    println!("Attempting to unlink: {}", &file.display());
     let file_path = if should_glob {
         let file = file.join("*");
         file
@@ -76,7 +76,9 @@ pub fn unlink_file<'a>(file: &'a PathBuf, should_glob: bool) -> DotsyResult<()> 
     }
 
     files_to_unlink.into_iter().for_each(|file| {
-        if !&file.exists() {
+        let metadata = fs::symlink_metadata(&file);
+        if let Err(..) = metadata {
+            dbg!(&file, "What the hell");
             eprintln!(
                 "{}",
                 DotsyError::Unlink {
@@ -85,20 +87,14 @@ pub fn unlink_file<'a>(file: &'a PathBuf, should_glob: bool) -> DotsyResult<()> 
             );
             return;
         }
-        let metadata = fs::symlink_metadata(&file).unwrap();
+        let metadata = metadata.unwrap();
         let file_type = metadata.file_type();
 
         let is_symlink = file_type.is_symlink();
         if !is_symlink {
-            // FIXME: This should be handled at an upper level
-            eprintln!(
-                "{}",
-                DotsyError::Unlink {
-                    link: file.to_str().unwrap().to_string()
-                }
-            );
             return;
         }
+        println!("Unlinking {}", &file.display());
 
         if file_type.is_dir() {
             fs::remove_file(&file).unwrap_or_else(|e| {
@@ -110,6 +106,7 @@ pub fn unlink_file<'a>(file: &'a PathBuf, should_glob: bool) -> DotsyResult<()> 
             })
         }
     });
+    println!("Done");
 
     return Ok(());
 }
