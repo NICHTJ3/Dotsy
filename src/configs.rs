@@ -66,7 +66,7 @@ impl ConfigFile for DotsyConfig {
 pub struct Link {
     pub from: PathBuf,
     pub to: PathBuf,
-    pub glob: bool,
+    pub glob: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -78,7 +78,6 @@ pub struct ProfileConfig {
     pub shell: Option<Vec<String>>,
     pub revert_shell: Option<Vec<String>>,
     pub configs: Option<Vec<String>>,
-    parent_dir: PathBuf,
 }
 
 impl ProfileConfig {
@@ -90,7 +89,6 @@ impl ProfileConfig {
         shell: Option<Vec<String>>,
         revert_shell: Option<Vec<String>>,
         configs: Option<Vec<String>>,
-        parent_dir: PathBuf,
     ) -> Self {
         Self {
             description,
@@ -100,7 +98,6 @@ impl ProfileConfig {
             shell,
             revert_shell,
             configs,
-            parent_dir,
         }
     }
 
@@ -118,16 +115,7 @@ impl ProfileConfig {
 
 impl ConfigFile for ProfileConfig {
     fn create(path: PathBuf) -> DotsyResult<Self> {
-        let config = ProfileConfig::new(
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            PathBuf::from("~/Dotfiles/configs"),
-        );
+        let config = ProfileConfig::new(None, None, None, None, None, None, None);
 
         let serialized = serde_json::to_string_pretty(&config).unwrap();
         let mut file = File::create(path).unwrap();

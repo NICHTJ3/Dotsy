@@ -45,8 +45,11 @@ pub fn link_file(from: PathBuf, to: PathBuf, should_glob: bool) -> DotsyResult<(
         results.for_each(|file| {
             // We need to get the name of the subfile/dir to link to and create the path for the
             // alias on the fly
+            // FIXME: This Should be handled by the caller
             let file_name = &file.file_name().unwrap();
-            link(&file, &to.join(file_name), should_glob).unwrap();
+            link(&file, &to.join(file_name), should_glob).unwrap_or_else(|e| {
+                eprintln!("{}", e);
+            });
         });
         Ok(())
     } else {
@@ -54,22 +57,59 @@ pub fn link_file(from: PathBuf, to: PathBuf, should_glob: bool) -> DotsyResult<(
     }
 }
 
-pub fn unlink_file(file: &PathBuf) -> DotsyResult<()> {
-    let metadata = fs::symlink_metadata(&file).unwrap();
-    let file_type = metadata.file_type();
-
-    let is_symlink = file_type.is_symlink();
-    if !is_symlink {
-        dotsy_err!(DotsyError::Unlink {
-            link: file.to_str().unwrap().to_string()
-        });
-    }
-
-    if file_type.is_dir() {
-        fs::remove_file(&file).unwrap()
+// TODO: This should handle globs
+pub fn unlink_file<'a>(file: &'a PathBuf, should_glob: bool) -> DotsyResult<()> {
+    let file_path = if should_glob {
+        let file = file.join("*");
+        file
     } else {
-        fs::remove_file(&file).unwrap()
+        file.to_path_buf()
+    };
+
+    let pattern = file_path.to_str().unwrap();
+    let mut files_to_unlink: Vec<PathBuf> = glob::glob(&pattern)
+        .expect("Failed to glob files")
+        .filter_map(Result::ok)
+        .collect();
+    if !should_glob {
+        files_to_unlink.push(file.to_path_buf());
     }
+
+    files_to_unlink.into_iter().for_each(|file| {
+        if !&file.exists() {
+            eprintln!(
+                "{}",
+                DotsyError::Unlink {
+                    link: file.to_str().unwrap().to_string()
+                }
+            );
+            return;
+        }
+        let metadata = fs::symlink_metadata(&file).unwrap();
+        let file_type = metadata.file_type();
+
+        let is_symlink = file_type.is_symlink();
+        if !is_symlink {
+            // FIXME: This should be handled at an upper level
+            eprintln!(
+                "{}",
+                DotsyError::Unlink {
+                    link: file.to_str().unwrap().to_string()
+                }
+            );
+            return;
+        }
+
+        if file_type.is_dir() {
+            fs::remove_file(&file).unwrap_or_else(|e| {
+                eprintln!("{}", e);
+            })
+        } else {
+            fs::remove_file(&file).unwrap_or_else(|e| {
+                eprintln!("{}", e);
+            })
+        }
+    });
 
     return Ok(());
 }
