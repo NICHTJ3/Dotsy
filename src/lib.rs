@@ -7,13 +7,47 @@ pub mod macros;
 
 use std::path::PathBuf;
 
-use configs::{ConfigFile, DotsyConfig};
+use std::fs;
+
+use configs::{ConfigFile, DotsyConfig, Link};
 use error::DotsyError;
 extern crate shellexpand;
 
 pub type DotsyResult<T, E = DotsyError> = ::std::result::Result<T, E>;
 
 // FIXME: This stuff should be handled better (there is a lot of duplicate logic
+
+fn get_absolute_link(link: Link, global_config: &DotsyConfig) -> Link {
+    let from = absolute(
+        global_config
+            .dotfiles
+            .join(&global_config.configs_dir)
+            .join(link.from),
+    );
+    let to = absolute(link.to);
+
+    return Link {
+        from,
+        to,
+        glob: link.glob,
+    };
+}
+
+fn link_exists(path: &PathBuf) -> bool {
+    let metadata = fs::symlink_metadata(&path);
+    if let Err(..) = metadata {
+        return false;
+    }
+    return true;
+}
+
+fn is_symlink(path: &PathBuf) -> bool {
+    let metadata = fs::symlink_metadata(&path);
+    if let Err(..) = metadata {
+        return false;
+    }
+    metadata.unwrap().file_type().is_symlink()
+}
 
 fn absolute(base: PathBuf) -> PathBuf {
     match shellexpand::tilde(&base.into_os_string().to_str().unwrap()) {
@@ -47,11 +81,7 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
 
     // Unlink files
     for link in config.links.unwrap_or_default() {
-        handlers::link::unlink_file(
-            &absolute(PathBuf::from(link.to)),
-            link.glob.unwrap_or_default(),
-        )
-        .unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run cleanup scripts
@@ -75,17 +105,7 @@ fn install_config(config: String, global_config: &DotsyConfig) {
     // Link files
     // TODO: I need to work more on paths logic
     for link in config.links.unwrap_or_default() {
-        handlers::link::link_file(
-            absolute(
-                global_config
-                    .dotfiles
-                    .join(&global_config.configs_dir)
-                    .join(link.from),
-            ),
-            absolute(link.to),
-            link.glob.unwrap_or_default(),
-        )
-        .unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::link_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run scripts
@@ -117,11 +137,7 @@ fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
 
     // Unlink files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::unlink_file(
-            &absolute(PathBuf::from(link.from)),
-            link.glob.unwrap_or_default(),
-        )
-        .unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Run cleanup scripts
@@ -142,12 +158,7 @@ fn install_profile(profile: String, global_config: &DotsyConfig) {
     // TODO: Extract this logic
     // Link files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::link_file(
-            absolute(PathBuf::from(link.from)),
-            absolute(PathBuf::from(link.to)),
-            link.glob.unwrap_or_default(),
-        )
-        .unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::link_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
     }
 
     // Make directories
