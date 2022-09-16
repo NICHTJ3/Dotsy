@@ -2,7 +2,7 @@ use std::{fs, os, path::PathBuf};
 
 use crate::{
     configs::{DotsyConfig, Link},
-    dotsy_err,
+    dotsy_err, dotsy_warn,
     error::DotsyError,
     get_absolute_link, is_symlink, link_exists, DotsyResult,
 };
@@ -12,10 +12,19 @@ fn link(link: Link) -> DotsyResult<()> {
     let from = link.from;
     println!("linking {} -> {}", from.display(), to.display());
 
-    if to.exists() && (to.is_file() || to.is_dir() && !link.glob.unwrap_or_default())
-        || !from.is_file() && !from.is_dir()
+    // A file, symlink, or directory alread exists at the location we're trying to link to
+    if to.exists()
+        && (to.is_file() || to.is_symlink() || (to.is_dir() && !link.glob.unwrap_or_default()))
     {
-        dotsy_err!(DotsyError::CouldntCreateSymLink { from: from, to: to });
+        dotsy_err!(DotsyError::FileAlreadyExists { file: (to) });
+    }
+
+    // The file, or directory we're trying to link from doesn't exist
+    if !from.is_file() && !from.is_dir() {
+        dotsy_err!(DotsyError::CouldntCreateSymLink {
+            from: (from),
+            to: (to)
+        });
     }
 
     let to_dir = to.parent().unwrap();
@@ -44,20 +53,29 @@ pub fn link_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()
         )
         .expect("Failed to glob files")
         .filter_map(Result::ok);
+
+        let mut has_pre_existing_links = false;
         results.for_each(|file| {
             // We need to get the name of the subfile/dir to link to and create the path for the
             // alias on the fly
-            // FIXME: This Should be handled by the caller
+            // FIXME: The error handling should be handled by the caller
             let file_name = &file.file_name().unwrap();
             link(Link {
                 from: file.to_path_buf(),
                 to: link_data.to.join(&file_name),
                 glob: link_data.glob,
             })
-            .unwrap_or_else(|e| {
-                eprintln!("{}", e);
+            .unwrap_or_else(|e| match e {
+                DotsyError::FileAlreadyExists { file: _ } => has_pre_existing_links = true,
+                _ => {
+                    eprintln!("{}", e);
+                }
             });
         });
+        if has_pre_existing_links {
+            // TODO: Allow for debug flag that would log when the error occurs as well
+            dotsy_warn!("Some links had existing files. You might want to consider uninstalling the config and re-installing");
+        }
         Ok(())
     } else {
         link(link_data)

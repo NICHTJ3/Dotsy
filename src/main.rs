@@ -27,43 +27,46 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
     if let Some(subcmd) = opt.cmd {
         match subcmd {
             cli::CliSubcommand::Init {
-                repo: _,
+                repo,
                 config: config_name,
                 profile: profile_name,
             } => {
                 if config_name.is_some() {
                     // TODO: Cleaner way to create config from config name
-                    let config_name = config_name.unwrap().as_str().to_owned();
+                    // TODO: Maybe I could move file_name creation to the create method
+                    let config_name = config_name.as_ref().unwrap().to_string();
                     let config_filename = configs::ConfigConfig::create_file_name(&config_name);
                     configs::ConfigConfig::create(PathBuf::from(config_filename)).unwrap();
-                } else if profile_name.is_some() {
-                    let profile_name = profile_name.unwrap().as_str().to_owned();
+                }
+                if profile_name.is_some() {
+                    let profile_name = profile_name.as_ref().unwrap().to_string();
                     let profile_filename = configs::ProfileConfig::create_file_name(&profile_name);
                     configs::ProfileConfig::create(PathBuf::from(profile_filename)).unwrap();
-                } else {
+                }
+                if (profile_name.is_none() && config_name.is_none()) || repo {
                     configs::DotsyConfig::create(PathBuf::from("./.dotsyrc.json")).unwrap();
                 }
             }
             cli::CliSubcommand::Profile(opts) => {
-                if opts.install.is_some() {
-                    dotsy::install_profiles(opts.install.unwrap(), &config);
+                if let Some(install) = opts.install {
+                    dotsy::install_profiles(install, &config);
                 }
-                if opts.uninstall.is_some() {
-                    dotsy::uninstall_profiles(opts.uninstall.unwrap(), &config);
+                if let Some(uninstall) = opts.uninstall {
+                    dotsy::uninstall_profiles(uninstall, &config);
                 }
                 if opts.validate.is_some() {
-                    println!("Ye");
+                    println!("---- TODO ----");
                 }
             }
             cli::CliSubcommand::Config(opts) => {
-                if opts.install.is_some() {
-                    dotsy::install_configs(opts.install.unwrap(), &config);
+                if let Some(install) = opts.install {
+                    dotsy::install_configs(install, &config);
                 }
-                if opts.uninstall.is_some() {
-                    dotsy::uninstall_configs(opts.uninstall.unwrap(), &config);
+                if let Some(uninstall) = opts.uninstall {
+                    dotsy::uninstall_configs(uninstall, &config);
                 }
                 if opts.validate.is_some() {
-                    println!("Ye");
+                    println!("---- TODO ----");
                 }
             }
             cli::CliSubcommand::List { configs, profiles } => {
@@ -107,21 +110,25 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                 let have_configs = configs_peekable.peek().is_some();
                 let have_profiles = profiles_peekable.peek().is_some();
 
-                if configs || !profiles && have_configs {
+                if !have_configs && !have_profiles {
+                    // TODO: Should this be done with error handling
+                    println!("No configs or profiles found to install!!");
+                    return Ok(());
+                }
+
+                if (configs || !profiles) && have_configs {
                     println!("Available Configs to install");
                     configs_peekable.for_each(|e| {
                         println!(" - {}", e.unwrap().display());
                     });
                     println!();
-                } else if have_profiles {
+                }
+                if (profiles || !configs) && have_profiles {
                     println!("Available Profiles to install");
                     profiles_peekable.for_each(|e| {
                         println!(" - {}", e.unwrap().display());
                     });
                     println!();
-                } else {
-                    // TODO: Should this be done with error handling
-                    println!("No configs or profiles found to install!!");
                 }
             }
         }

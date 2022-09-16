@@ -19,7 +19,7 @@ pub enum DotsyError {
     ))]
     CouldntCreateSymLink { from: PathBuf, to: PathBuf },
     #[snafu(display(
-        "Error: we had some trouble the file or directory please check this path doesn't already exist: {file}",
+        "Error: we had some trouble creating the file or directory please check this path doesn't already exist: {file}",
         file=file.display()
     ))]
     FileAlreadyExists { file: PathBuf },
