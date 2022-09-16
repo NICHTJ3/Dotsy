@@ -1,3 +1,5 @@
+use ansi_term::Color::Purple;
+use ansi_term::Color::Yellow;
 use std::{fs, os, path::PathBuf};
 
 use crate::{
@@ -10,7 +12,12 @@ use crate::{
 fn link(link: Link) -> DotsyResult<()> {
     let to = link.to;
     let from = link.from;
-    println!("linking {} -> {}", from.display(), to.display());
+    println!(
+        "{msg} {from} -> {to}",
+        msg = Purple.paint("Attempting to link files:"),
+        from = from.display(),
+        to = to.display()
+    );
 
     // A file, symlink, or directory alread exists at the location we're trying to link to
     if to.exists()
@@ -66,7 +73,10 @@ pub fn link_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()
                 glob: link_data.glob,
             })
             .unwrap_or_else(|e| match e {
-                DotsyError::FileAlreadyExists { file: _ } => has_pre_existing_links = true,
+                DotsyError::FileAlreadyExists { file: _ } => {
+                    has_pre_existing_links = true;
+                    println!("{}", Yellow.paint("Link already exists..."))
+                }
                 _ => {
                     eprintln!("{}", e);
                 }

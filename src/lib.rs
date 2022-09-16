@@ -6,6 +6,7 @@ pub mod handlers;
 pub mod macros;
 
 use std::path::PathBuf;
+use ansi_term::Colour::Green;
 
 use std::fs;
 
@@ -69,7 +70,11 @@ pub fn uninstall_configs(configs: Vec<String>, global_config: &DotsyConfig) {
 }
 
 fn uninstall_config(config: String, global_config: &DotsyConfig) {
-    println!("Attempting to uninstall config: {}", config);
+    println!(
+        "{message}: {arg}",
+        message = Green.paint("Attempting to uninstall config"),
+        arg = config
+    );
 
     let config = {
         let this = configs::ConfigConfig::load_by_name(&config, &global_config);
@@ -91,7 +96,11 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
 }
 
 fn install_config(config: String, global_config: &DotsyConfig) {
-    println!("Attempting to install config: {}", config);
+    println!(
+        "{message}: {arg}",
+        message = Green.paint("Attempting to install config"),
+        arg = config
+    );
 
     let config = {
         let this = configs::ConfigConfig::load_by_name(&config, &global_config);
@@ -132,7 +141,11 @@ pub fn uninstall_profiles(profiles: Vec<String>, global_config: &DotsyConfig) {
 }
 
 fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
-    println!("Attempting to uninstall profile: {}", profile);
+    println!(
+        "{message}: {arg}",
+        message = Green.paint("Attempting to uninstall profile"),
+        arg = profile
+    );
     let profile = configs::ProfileConfig::load_by_name(&profile, global_config).unwrap();
 
     // Unlink files
@@ -152,7 +165,11 @@ fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
 }
 
 fn install_profile(profile: String, global_config: &DotsyConfig) {
-    println!("Attempting to install profile: {}", profile);
+    println!(
+        "{message}: {arg}",
+        message = Green.paint("Attempting to install profile"),
+        arg = profile
+    );
     let profile = configs::ProfileConfig::load_by_name(&profile, global_config).unwrap();
 
     // TODO: Extract this logic

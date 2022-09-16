@@ -21,7 +21,7 @@ macro_rules! xdg_config_home {
 #[macro_export]
 macro_rules! dotsy_warn {
     ($($arg:tt)+) => (
-        print!("WARN: ");
+        print!("{}: ",ansi_term::Color::Yellow.paint("WARN"));
         println!($($arg)+)
     )
 }

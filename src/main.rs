@@ -1,4 +1,5 @@
 extern crate glob;
+extern crate ansi_term;
 
 use dotsy::{
     cli::{self, Cli},
