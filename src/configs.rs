@@ -19,10 +19,10 @@ pub trait ConfigFile {
         for<'de> Self: Deserialize<'de>,
     {
         let file = {
-            let this = File::open(path);
+            let this = File::open(&path);
             match this {
                 Ok(t) => t,
-                Err(..) => dotsy_err!(DotsyError::TODO),
+                Err(..) => dotsy_err!(DotsyError::ConfigNotAvailable { config: (path) }),
             }
         };
         let reader = BufReader::new(file);
@@ -30,7 +30,7 @@ pub trait ConfigFile {
         let v: Self = serde_json::from_reader(reader).unwrap();
         Ok(v)
     }
-    fn create(path: PathBuf) -> DotsyResult<Self>
+    fn create(file_name: &str) -> DotsyResult<Self>
     where
         Self: Sized;
 }
@@ -45,7 +45,7 @@ pub struct DotsyConfig {
 }
 
 impl ConfigFile for DotsyConfig {
-    fn create(path: PathBuf) -> DotsyResult<Self> {
+    fn create(file_name: &str) -> DotsyResult<Self> {
         let config = DotsyConfig {
             dotfiles: PathBuf::from("~/Dotfiles"),
             package_add_command: "brew add {}".to_string(),
@@ -55,7 +55,8 @@ impl ConfigFile for DotsyConfig {
         };
 
         let serialized = serde_json::to_string_pretty(&config).unwrap();
-        let mut file = File::create(path).unwrap();
+
+        let mut file = File::create(PathBuf::from(file_name)).unwrap();
 
         file.write_all(serialized.as_bytes()).unwrap();
         Ok(config)
@@ -114,7 +115,8 @@ impl ProfileConfig {
 }
 
 impl ConfigFile for ProfileConfig {
-    fn create(path: PathBuf) -> DotsyResult<Self> {
+    fn create(profile_name: &str) -> DotsyResult<Self> {
+        let path = PathBuf::from(ProfileConfig::create_file_name(&profile_name));
         let config = ProfileConfig::new(None, None, None, None, None, None, None);
 
         let serialized = serde_json::to_string_pretty(&config).unwrap();
@@ -153,7 +155,7 @@ impl ConfigConfig {
             revert_shell,
         }
     }
-    pub fn create_file_name(name: &str) -> String {
+    fn create_file_name(name: &str) -> String {
         format!("./{}.config.json", name)
     }
 
@@ -166,7 +168,8 @@ impl ConfigConfig {
 }
 
 impl ConfigFile for ConfigConfig {
-    fn create(path: PathBuf) -> DotsyResult<Self> {
+    fn create(config_name: &str) -> DotsyResult<Self> {
+        let path = PathBuf::from(ConfigConfig::create_file_name(&config_name));
         let config = ConfigConfig::new(None, None, None, None, None, None);
         let serialized = serde_json::to_string_pretty(&config).unwrap();
         let mut file = File::create(path).unwrap();

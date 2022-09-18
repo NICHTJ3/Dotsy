@@ -2,27 +2,33 @@ use std::path::PathBuf;
 
 use structopt::{clap::AppSettings, StructOpt};
 
+// #[derive(Debug, StructOpt)]
+// pub struct ProfileConfigSubCommand {
+//     #[structopt(short, long)]
+//     pub install: Option<Vec<String>>,
+//     #[structopt(short, long)]
+//     pub uninstall: Option<Vec<String>>,
+//     #[structopt(short, long)]
+//     pub validate: Option<Vec<String>>,
+//     #[structopt(short = "l", long = "list")]
+// }
+
 #[derive(Debug, StructOpt)]
-pub struct ProfileConfigSubCommand {
-    #[structopt(short, long)]
-    pub install: Option<Vec<String>>,
-    #[structopt(short, long)]
-    pub uninstall: Option<Vec<String>>,
-    #[structopt(short, long)]
-    pub validate: Option<Vec<String>>,
+pub struct Values {
+    pub values: Vec<String>,
+}
+
+#[derive(Debug, StructOpt)]
+pub enum ProfileConfigSubCommand {
+    Install(Values),
+    Uninstall(Values),
+    List,
 }
 
 #[derive(Debug, StructOpt)]
 pub enum CliSubcommand {
     Profile(ProfileConfigSubCommand),
     Config(ProfileConfigSubCommand),
-    #[structopt(alias = "ls")]
-    List {
-        #[structopt(short = "c", long = "configs")]
-        configs: bool,
-        #[structopt(short = "p", long = "profiles")]
-        profiles: bool,
-    },
     Init {
         #[structopt(short = "r", long = "repo")]
         repo: bool,

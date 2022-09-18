@@ -1,8 +1,11 @@
 # Dotsy
 
-A Huge WIP... Infact most of it doesn't work so don't bother downloading yet 😂 It'll get there eventually 🤦
+A Huge WIP... Infact most of it doesn't work so don't bother downloading yet 😂
+It'll get there eventually 🤦
 
-The idea behind this was to be able to manage and reinstall a config or profile from where ever you were in the file tree. For example
+The idea behind this was to be able to manage and reinstall a config or profile
+from where ever you were in the file tree. For example
+
 ```sh
 ls ~/
 > ~/Dotfiles
@@ -16,12 +19,15 @@ dotsy config -i neovim
 # when I break things)
 ```
 
-Getting started on a new machine would theoretically be as simple as running this after cloning your dotfiles
+Getting started on a new machine would theoretically be as simple as running
+this after cloning your dotfiles
+
 ```sh
 cargo install dotsy
 dotsy init
-# ^ After this you would have to fill in the config file with the location 
-# of your dotfiles but this step could be skipped if you have a .dotsyrc in your dotfiles repo
+# ^ After this you would have to fill in the config file with the location
+# of your dotfiles but this step could be skipped if you have a .dotsyrc in your
+# dotfiles repo
 dotsy profile -i <name of profile to install>
 ```
 
@@ -29,12 +35,12 @@ dotsy profile -i <name of profile to install>
 
 ### Command structure?
 
-- `dotsy profile -i <profile-name/'s'>`
-- `dotsy profile -u <profile-name/'s'>`
-- `dotsy config -i <config-name/'s>`
-- `dotsy config -u <config-name/'s>`
-- `dotsy config ls`
-- `dotsy profile ls`
+- `dotsy profile install <profile-name/'s'>`
+- `dotsy profile uninstall <profile-name/'s'>`
+- `dotsy config install <config-name/'s>`
+- `dotsy config uninstall <config-name/'s>`
+- `dotsy config list`
+- `dotsy profile list`
 
 ### File structure
 

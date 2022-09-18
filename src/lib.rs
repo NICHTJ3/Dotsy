@@ -1,12 +1,13 @@
 pub mod cli;
+pub mod commands;
 pub mod configs;
 pub mod defaults;
 pub mod error;
 pub mod handlers;
 pub mod macros;
 
-use std::path::PathBuf;
 use ansi_term::Colour::Green;
+use std::path::PathBuf;
 
 use std::fs;
 
@@ -16,7 +17,7 @@ extern crate shellexpand;
 
 pub type DotsyResult<T, E = DotsyError> = ::std::result::Result<T, E>;
 
-// FIXME: This stuff should be handled better (there is a lot of duplicate logic
+// FIXME: This stuff should be handled better (there is a lot of duplicate logic)
 
 fn get_absolute_link(link: Link, global_config: &DotsyConfig) -> Link {
     let from = absolute(
@@ -80,18 +81,19 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
         let this = configs::ConfigConfig::load_by_name(&config, &global_config);
         match this {
             Ok(t) => t,
-            Err(e) => return eprintln!("{}", e),
+            Err(e) => return dotsy_log_error!("{}", e),
         }
     };
 
     // Unlink files
     for link in config.links.unwrap_or_default() {
-        handlers::link::unlink_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(link, global_config)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Run cleanup scripts
     for script in config.revert_shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 }
 
@@ -106,7 +108,7 @@ fn install_config(config: String, global_config: &DotsyConfig) {
         let this = configs::ConfigConfig::load_by_name(&config, &global_config);
         match this {
             Ok(t) => t,
-            Err(e) => return eprintln!("{}", e),
+            Err(e) => return dotsy_log_error!("{}", e),
         }
     };
 
@@ -114,82 +116,84 @@ fn install_config(config: String, global_config: &DotsyConfig) {
     // Link files
     // TODO: I need to work more on paths logic
     for link in config.links.unwrap_or_default() {
-        handlers::link::link_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::link_file(link, global_config)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Run scripts
     for script in config.shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Make directories
     for dir in config.directories.unwrap_or_default() {
-        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 }
 
-pub fn install_profiles(profiles: Vec<String>, global_config: &DotsyConfig) {
-    for profile in profiles {
-        install_profile(profile, global_config)
-    }
-}
-
-pub fn uninstall_profiles(profiles: Vec<String>, global_config: &DotsyConfig) {
-    for profile in profiles {
-        uninstall_profile(profile, global_config);
-    }
-}
-
-fn uninstall_profile(profile: String, global_config: &DotsyConfig) {
+fn uninstall_profile(_profile: String, global_config: &DotsyConfig) {
     println!(
         "{message}: {arg}",
         message = Green.paint("Attempting to uninstall profile"),
-        arg = profile
+        arg = _profile
     );
-    let profile = configs::ProfileConfig::load_by_name(&profile, global_config).unwrap();
+    let profile = configs::ProfileConfig::load_by_name(&_profile, global_config).unwrap();
 
     // Unlink files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::unlink_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::unlink_file(link, global_config)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Run cleanup scripts
     for script in profile.revert_shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Uninstall configs
     for config in profile.configs.unwrap_or_default() {
         uninstall_config(config, global_config);
     }
+    println!(
+        "{message}: {arg}",
+        message = Green.paint("Finished uninstalling profile"),
+        arg = _profile
+    );
 }
 
-fn install_profile(profile: String, global_config: &DotsyConfig) {
+fn install_profile(_profile: String, global_config: &DotsyConfig) {
     println!(
         "{message}: {arg}",
         message = Green.paint("Attempting to install profile"),
-        arg = profile
+        arg = _profile
     );
-    let profile = configs::ProfileConfig::load_by_name(&profile, global_config).unwrap();
+    let profile = configs::ProfileConfig::load_by_name(&_profile, global_config).unwrap();
 
     // TODO: Extract this logic
     // Link files
     for link in profile.links.unwrap_or_default() {
-        handlers::link::link_file(link, global_config).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::link::link_file(link, global_config)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Make directories
     for dir in profile.directories.unwrap_or_default() {
-        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Run scripts
     for script in profile.shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| eprintln!("{}", e));
+        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Install configs
     install_configs(profile.configs.unwrap_or_default(), global_config);
+
+    println!(
+        "{message}: {arg}",
+        message = Green.paint("Finished installing profile"),
+        arg = _profile
+    );
 }
 
 // TODO: Find a way to cache the load of the rcfile for the life of the program

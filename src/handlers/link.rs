@@ -2,9 +2,10 @@ use ansi_term::Color::Purple;
 use ansi_term::Color::Yellow;
 use std::{fs, os, path::PathBuf};
 
+use crate::dotsy_log_error;
 use crate::{
     configs::{DotsyConfig, Link},
-    dotsy_err, dotsy_warn,
+    dotsy_err, dotsy_log_warning,
     error::DotsyError,
     get_absolute_link, is_symlink, link_exists, DotsyResult,
 };
@@ -78,13 +79,13 @@ pub fn link_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()
                     println!("{}", Yellow.paint("Link already exists..."))
                 }
                 _ => {
-                    eprintln!("{}", e);
+                    dotsy_log_error!("{}", e);
                 }
             });
         });
         if has_pre_existing_links {
             // TODO: Allow for debug flag that would log when the error occurs as well
-            dotsy_warn!("Some links had existing files. You might want to consider uninstalling the config and re-installing");
+            dotsy_log_warning!("Some links had existing files. You might want to consider uninstalling the config and re-installing");
         }
         Ok(())
     } else {
@@ -125,11 +126,11 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
 
         if file_type.is_dir() {
             fs::remove_file(&file).unwrap_or_else(|e| {
-                eprintln!("{}", e);
+                dotsy_log_error!("{}", e);
             })
         } else {
             fs::remove_file(&file).unwrap_or_else(|e| {
-                eprintln!("{}", e);
+                dotsy_log_error!("{}", e);
             })
         }
     });
