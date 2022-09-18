@@ -1,6 +1,6 @@
 [package]
 name = "dotsy"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2018"
 description = "A basic dotfile manager created to replace my usage of dotbot."
 license = "MIT"
