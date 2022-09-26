@@ -1,9 +1,8 @@
 # Dotsy
 
-A Huge WIP... Infact most of it doesn't work so don't bother downloading yet 😂
-It'll get there eventually 🤦
+A Huge WIP... 🤦
 
-The idea behind this was to be able to manage and reinstall a config or profile
+The idea behind this is to be able to manage and reinstall a config or profile
 from where ever you were in the file tree. For example
 
 ```sh
@@ -13,9 +12,9 @@ ls ~/
 pwd
 > ~/dev/supercool-project/
 
-dotsy config -i neovim
+dotsy config install neovim
 # ^ This would install your neovim config without moving you
-# out of the directory or context you're currently in (i've felt this is useful 
+# out of the directory or context you're currently in (i've felt this is useful
 # when I break things)
 ```
 
@@ -28,7 +27,7 @@ dotsy init
 # ^ After this you would have to fill in the config file with the location
 # of your dotfiles but this step could be skipped if you have a .dotsyrc in your
 # dotfiles repo
-dotsy profile -i <name of profile to install>
+dotsy profile install <name of profile to install>
 ```
 
 ## Planning
