@@ -13,11 +13,9 @@ pub fn fallback_path() -> DotsyResult<PathBuf> {
 
     // Loops for a vector of possible paths and tries to generate config from the first
     // default path that exists.
-    for config_path in default_config_paths {
-        if let Some(path) = config_path {
-            if path.exists() {
-                return Ok(path);
-            }
+    for config_path in default_config_paths.into_iter().flatten() {
+        if config_path.exists() {
+            return Ok(config_path);
         }
     }
     dotsy_err!(DotsyError::NoConfigFile)

@@ -24,12 +24,12 @@ fn link(link: Link) -> DotsyResult<()> {
     if to.exists()
         && (to.is_file() || to.is_symlink() || (to.is_dir() && !link.glob.unwrap_or_default()))
     {
-        dotsy_err!(DotsyError::FileAlreadyExists { file: (to) });
+        return dotsy_err!(DotsyError::FileAlreadyExists { file: (to) });
     }
 
     // The file, or directory we're trying to link from doesn't exist
     if !from.is_file() && !from.is_dir() {
-        dotsy_err!(DotsyError::CouldntCreateSymLink {
+        return dotsy_err!(DotsyError::CouldntCreateSymLink {
             from: (from),
             to: (to)
         });
@@ -40,24 +40,23 @@ fn link(link: Link) -> DotsyResult<()> {
         fs::create_dir_all(to_dir).unwrap();
     };
 
-    if let Err(..) = os::unix::fs::symlink(&from, &to) {
-        dotsy_err!(DotsyError::CouldntCreateSymLink { from: from, to: to });
+    if os::unix::fs::symlink(&from, &to).is_err() {
+        return dotsy_err!(DotsyError::CouldntCreateSymLink { from, to });
     }
 
-    return Ok(());
+    Ok(())
 }
 
 pub fn link_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()> {
     let link_data = get_absolute_link(link_data, global_config);
     if link_data.glob.unwrap_or_default() {
         let results = glob::glob(
-            &link_data
+            link_data
                 .from
                 .to_path_buf()
                 .into_os_string()
                 .to_str()
-                .unwrap()
-                .to_string(),
+                .unwrap(),
         )
         .expect("Failed to glob files")
         .filter_map(Result::ok);
@@ -70,7 +69,7 @@ pub fn link_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()
             let file_name = &file.file_name().unwrap();
             link(Link {
                 from: file.to_path_buf(),
-                to: link_data.to.join(&file_name),
+                to: link_data.to.join(file_name),
                 glob: link_data.glob,
             })
             .unwrap_or_else(|e| match e {
@@ -104,13 +103,13 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
     let files_to_unlink: Vec<PathBuf> = if should_glob {
         let file = file.join("*");
         let pattern = file.to_str().unwrap();
-        glob::glob(&pattern)
+        glob::glob(pattern)
             .expect("Failed to glob files")
             .filter_map(Result::ok)
             .collect()
     } else {
         if !link_exists(&file) {
-            dotsy_err!(DotsyError::Unlink { link: file });
+            return dotsy_err!(DotsyError::Unlink { link: file });
         }
         vec![file.to_path_buf()]
     };
@@ -136,5 +135,5 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
     });
     println!("Done");
 
-    return Ok(());
+    Ok(())
 }

@@ -28,24 +28,24 @@ fn get_absolute_link(link: Link, global_config: &DotsyConfig) -> Link {
     );
     let to = absolute(link.to);
 
-    return Link {
+    Link {
         from,
         to,
         glob: link.glob,
-    };
+    }
 }
 
 fn link_exists(path: &PathBuf) -> bool {
-    let metadata = fs::symlink_metadata(&path);
-    if let Err(..) = metadata {
+    let metadata = fs::symlink_metadata(path);
+    if metadata.is_err() {
         return false;
     }
-    return true;
+    true
 }
 
 fn is_symlink(path: &PathBuf) -> bool {
-    let metadata = fs::symlink_metadata(&path);
-    if let Err(..) = metadata {
+    let metadata = fs::symlink_metadata(path);
+    if metadata.is_err() {
         return false;
     }
     metadata.unwrap().file_type().is_symlink()
@@ -78,7 +78,7 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
     );
 
     let config = {
-        let this = configs::ConfigConfig::load_by_name(&config, &global_config);
+        let this = configs::ConfigConfig::load_by_name(&config, global_config);
         match this {
             Ok(t) => t,
             Err(e) => return dotsy_log_error!("{}", e),
@@ -105,7 +105,7 @@ fn install_config(config: String, global_config: &DotsyConfig) {
     );
 
     let config = {
-        let this = configs::ConfigConfig::load_by_name(&config, &global_config);
+        let this = configs::ConfigConfig::load_by_name(&config, global_config);
         match this {
             Ok(t) => t,
             Err(e) => return dotsy_log_error!("{}", e),
@@ -203,5 +203,5 @@ pub fn load_rcfile() -> DotsyResult<DotsyConfig> {
     let mut config = configs::DotsyConfig::load(rcfile_path).unwrap();
     config.dotfiles = absolute(config.dotfiles);
 
-    return Ok(config);
+    Ok(config)
 }

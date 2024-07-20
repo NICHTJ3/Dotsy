@@ -22,7 +22,7 @@ pub trait ConfigFile {
             let this = File::open(&path);
             match this {
                 Ok(t) => t,
-                Err(..) => dotsy_err!(DotsyError::ConfigNotAvailable { config: (path) }),
+                Err(..) => return dotsy_err!(DotsyError::ConfigNotAvailable { config: (path) }),
             }
         };
         let reader = BufReader::new(file);
@@ -116,7 +116,7 @@ impl ProfileConfig {
 
 impl ConfigFile for ProfileConfig {
     fn create(profile_name: &str) -> DotsyResult<Self> {
-        let path = PathBuf::from(ProfileConfig::create_file_name(&profile_name));
+        let path = PathBuf::from(ProfileConfig::create_file_name(profile_name));
         let config = ProfileConfig::new(None, None, None, None, None, None, None);
 
         let serialized = serde_json::to_string_pretty(&config).unwrap();
@@ -169,7 +169,7 @@ impl ConfigConfig {
 
 impl ConfigFile for ConfigConfig {
     fn create(config_name: &str) -> DotsyResult<Self> {
-        let path = PathBuf::from(ConfigConfig::create_file_name(&config_name));
+        let path = PathBuf::from(ConfigConfig::create_file_name(config_name));
         let config = ConfigConfig::new(None, None, None, None, None, None);
         let serialized = serde_json::to_string_pretty(&config).unwrap();
         let mut file = File::create(path).unwrap();

@@ -14,7 +14,7 @@ pub fn run_script(script: &str) -> DotsyResult<()> {
         match this {
             Ok(t) => t,
             Err(..) => {
-                dotsy_err!(DotsyError::FailedToRunCommand)
+                return dotsy_err!(DotsyError::FailedToRunCommand)
             }
         }
     };
@@ -22,7 +22,7 @@ pub fn run_script(script: &str) -> DotsyResult<()> {
     match command.wait() {
         Ok(t) => t,
         Err(..) => {
-            dotsy_err!(DotsyError::FailedToRunCommand)
+            return dotsy_err!(DotsyError::FailedToRunCommand)
         }
     };
 
