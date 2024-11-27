@@ -1,10 +1,15 @@
 # Dotsy
 
-A Huge WIP... 🤦
+A Huge WIP for managing dotfiles 🧪
 
-The idea behind this is to be able to manage and reinstall a config or profile
-from where ever you were in the file tree. For example
+https://github.com/user-attachments/assets/2937ebfe-6d4b-4ea3-935f-1b215e806766
 
+## The thinking behind Dotsy
+
+The main idea behind this is to be able to manage and reinstall a "config" or "profile"
+from where ever you were in the file tree. 
+
+For example
 ```sh
 ls ~/
 > ~/Dotfiles
@@ -14,7 +19,7 @@ pwd
 
 dotsy config install neovim
 # ^ This would install your neovim config without moving you
-# out of the directory or context you're currently in (i've felt this is useful
+# out of the directory or context you're currently in (I've felt this is useful
 # when I break things)
 ```
 
