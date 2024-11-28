@@ -19,8 +19,11 @@ pub fn list(config: &DotsyConfig) {
     let configs = glob(configs_regex.to_str().unwrap()).expect("Failed to read glob pattern");
 
     println!("Available Configs to install");
-    configs.for_each(|e| {
-        println!(" - {}", e.unwrap().display());
+    configs.filter_map(Result::ok).for_each(|config| {
+        // Strip both extensions e.g. json, config from the filename before printing it
+        if let Some(file_name) = config.with_extension("").with_extension("").file_name() {
+            println!(" - {}", file_name.to_str().unwrap());
+        }
     });
     println!();
 }
