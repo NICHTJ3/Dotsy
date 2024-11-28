@@ -43,14 +43,14 @@ cd config
 dotsy init --config test # This command will create a test.config.json file in the current directory
 
 # Update the file to contain the following
-#{
+# {
 #    "links": [
 #        {
 #            "from": "test_file", # Link the test_file created earlier
 #            "to": "~/test_file" # To ~/test_file
 #        }
 #    ]
-#}
+# }
 ```
 
 Listing your configs
@@ -70,7 +70,7 @@ dotsy install test
 cat ~/test_file # My test file
 ```
 
-Go take a look at my dotfiles for more of a "real world" example https://github.com/nichtj3/dotfiles
+Go take a look at my dotfiles for more of a "real world" example https://github.com/nichtj3/dotfiles or run `dotsy --help`
 
 ## The thinking behind Dotsy
 
@@ -104,16 +104,7 @@ dotsy init
 dotsy profile install <name of profile to install>
 ```
 
-## Planning
-
-### Command structure?
-
-- `dotsy profile install <profile-name/'s'>`
-- `dotsy profile uninstall <profile-name/'s'>`
-- `dotsy config install <config-name/'s>`
-- `dotsy config uninstall <config-name/'s>`
-- `dotsy config list`
-- `dotsy profile list`
+## Configuration
 
 ### File structure
 
