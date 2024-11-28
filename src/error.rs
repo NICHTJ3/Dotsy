@@ -2,7 +2,6 @@ use snafu::Snafu;
 use std::path::PathBuf;
 
 #[derive(Snafu, Debug)]
-#[snafu(visibility = "pub(crate)")]
 pub enum DotsyError {
     #[snafu(display("I need an error message for this case"))]
     TODO,
