@@ -5,8 +5,9 @@ use dotsy::{
     cli::{self, Cli},
     commands, dotsy_log_error, DotsyResult,
 };
+use std::io::stdout;
 use std::process;
-use structopt::StructOpt;
+use structopt::{clap::Shell, StructOpt};
 
 fn main() {
     let opt = Cli::from_args();
@@ -52,6 +53,14 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                     commands::config::list(&config);
                 }
             },
+            cli::CliSubcommand::Completions(opts) => {
+                let shell = match opts {
+                    cli::CompletionsSubCommand::Zsh => Shell::Zsh,
+                    cli::CompletionsSubCommand::Bash => Shell::Bash,
+                };
+
+                Cli::clap().gen_completions_to(env!("CARGO_PKG_NAME"), shell, &mut stdout())
+            }
         }
     }
     Ok(())

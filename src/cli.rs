@@ -26,6 +26,12 @@ pub enum ProfileConfigSubCommand {
 }
 
 #[derive(Debug, StructOpt)]
+pub enum CompletionsSubCommand {
+    Zsh,
+    Bash,
+}
+
+#[derive(Debug, StructOpt)]
 pub enum CliSubcommand {
     Profile(ProfileConfigSubCommand),
     Config(ProfileConfigSubCommand),
@@ -37,6 +43,7 @@ pub enum CliSubcommand {
         #[structopt(short = "p", long = "profile")]
         profile: Option<String>,
     },
+    Completions(CompletionsSubCommand),
 }
 
 #[derive(StructOpt, Debug)]
