@@ -49,7 +49,7 @@ fn handle_subcommands(opt: Cli) -> DotsyResult<()> {
                     commands::config::install(opts.values, &config);
                 }
                 cli::ProfileConfigSubCommand::List => {
-                    commands::profile::list(&config);
+                    commands::config::list(&config);
                 }
             },
         }
