@@ -23,8 +23,11 @@ pub fn list(config: &DotsyConfig) {
     let profiles = glob(profiles_regex.to_str().unwrap()).expect("Failed to read glob pattern");
 
     println!("Available Profiles to install");
-    profiles.for_each(|e| {
-        println!(" - {}", e.unwrap().display());
+    profiles.filter_map(Result::ok).for_each(|profile| {
+        // Strip both extensions e.g. json, profile from the filename before printing it
+        if let Some(file_name) = profile.with_extension("").with_extension("").file_name() {
+            println!(" - {}", file_name.to_str().unwrap());
+        }
     });
     println!();
 }
