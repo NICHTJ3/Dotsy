@@ -17,8 +17,8 @@ path = "src/main.rs"
 
 [dependencies]
 dirs = "6.0.0"
-glob = "0.3.0"
-serde = { version = "1.0.130", features = ["derive"] }
+glob = "0.3.2"
+serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.137"
 shellexpand = "3.1.0"
 snafu = "0.8.5"
