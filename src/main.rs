@@ -1,14 +1,14 @@
 extern crate ansi_term;
 extern crate glob;
 
-use dotsy::cli::{CliSubcommand, CompletionsSubCommand, ProfileConfigSubCommand::*};
+use dotsy::cli::{CliSubcommand, ProfileConfigSubCommand::*};
 use dotsy::{
     cli::{Cli, CliSubcommand::*},
     commands, dotsy_log_error, DotsyResult,
 };
 use std::io::stdout;
 use std::process;
-use structopt::{clap::Shell, StructOpt};
+use structopt::StructOpt;
 
 fn main() {
     let cli = Cli::from_args();
