@@ -92,6 +92,7 @@ pub fn link_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()
     }
 }
 
+// TODO: Fix this unlinking files that were not in the from path
 pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<()> {
     let link_data = get_absolute_link(link_data, global_config);
 
@@ -114,7 +115,7 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
         vec![file.to_path_buf()]
     };
 
-    files_to_unlink.into_iter().for_each(|file| {
+    files_to_unlink.iter().for_each(|file| {
         if !is_symlink(&file) {
             return;
         }
@@ -124,11 +125,11 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
         println!("Unlinking {}", &file.display());
 
         if file_type.is_dir() {
-            fs::remove_file(&file).unwrap_or_else(|e| {
+            fs::remove_file(file).unwrap_or_else(|e| {
                 dotsy_log_error!("{}", e);
             })
         } else {
-            fs::remove_file(&file).unwrap_or_else(|e| {
+            fs::remove_file(file).unwrap_or_else(|e| {
                 dotsy_log_error!("{}", e);
             })
         }

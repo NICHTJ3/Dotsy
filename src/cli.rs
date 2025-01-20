@@ -1,17 +1,9 @@
 use std::path::PathBuf;
 
-use structopt::{clap::AppSettings, StructOpt};
-
-// #[derive(Debug, StructOpt)]
-// pub struct ProfileConfigSubCommand {
-//     #[structopt(short, long)]
-//     pub install: Option<Vec<String>>,
-//     #[structopt(short, long)]
-//     pub uninstall: Option<Vec<String>>,
-//     #[structopt(short, long)]
-//     pub validate: Option<Vec<String>>,
-//     #[structopt(short = "l", long = "list")]
-// }
+use structopt::{
+    clap::{AppSettings, Shell},
+    StructOpt,
+};
 
 #[derive(Debug, StructOpt)]
 pub struct Values {
@@ -29,6 +21,15 @@ pub enum ProfileConfigSubCommand {
 pub enum CompletionsSubCommand {
     Zsh,
     Bash,
+}
+
+impl From<CompletionsSubCommand> for Shell {
+    fn from(cmd: CompletionsSubCommand) -> Self {
+        match cmd {
+            CompletionsSubCommand::Zsh => Self::Zsh,
+            CompletionsSubCommand::Bash => Self::Bash,
+        }
+    }
 }
 
 #[derive(Debug, StructOpt)]

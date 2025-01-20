@@ -196,7 +196,6 @@ fn install_profile(_profile: String, global_config: &DotsyConfig) {
     );
 }
 
-// TODO: Find a way to cache the load of the rcfile for the life of the program
 pub fn load_rcfile() -> DotsyResult<DotsyConfig> {
     let rcfile_path = defaults::fallback_path().unwrap();
 
