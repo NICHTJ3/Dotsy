@@ -102,11 +102,10 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
     println!("Attempting to unlink: {}", &file.display());
 
     let files_to_unlink: Vec<PathBuf> = if should_glob {
-        let file = file.join("*");
-        let pattern = file.to_str().unwrap();
-        glob::glob(pattern)
+        glob::glob(link_data.from.to_path_buf().to_str().unwrap())
             .expect("Failed to glob files")
             .filter_map(Result::ok)
+            .map(|linked_file| file.join(linked_file.file_name().unwrap()))
             .collect()
     } else {
         if !link_exists(&file) {
@@ -116,23 +115,13 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
     };
 
     files_to_unlink.iter().for_each(|file| {
-        if !is_symlink(&file) {
+        if !is_symlink(file) {
             return;
         }
-
-        let file_type = fs::symlink_metadata(&file).unwrap().file_type();
-
         println!("Unlinking {}", &file.display());
-
-        if file_type.is_dir() {
-            fs::remove_file(file).unwrap_or_else(|e| {
-                dotsy_log_error!("{}", e);
-            })
-        } else {
-            fs::remove_file(file).unwrap_or_else(|e| {
-                dotsy_log_error!("{}", e);
-            })
-        }
+        fs::remove_file(file).unwrap_or_else(|e| {
+            dotsy_log_error!("{}", e);
+        })
     });
     println!("Done");
 
