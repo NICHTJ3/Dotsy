@@ -118,20 +118,10 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
         if !is_symlink(file) {
             return;
         }
-
-        let file_type = fs::symlink_metadata(file).unwrap().file_type();
-
         println!("Unlinking {}", &file.display());
-
-        if file_type.is_dir() {
-            fs::remove_file(file).unwrap_or_else(|e| {
-                dotsy_log_error!("{}", e);
-            })
-        } else {
-            fs::remove_file(file).unwrap_or_else(|e| {
-                dotsy_log_error!("{}", e);
-            })
-        }
+        fs::remove_file(file).unwrap_or_else(|e| {
+            dotsy_log_error!("{}", e);
+        })
     });
     println!("Done");
 
