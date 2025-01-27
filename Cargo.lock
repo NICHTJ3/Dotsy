@@ -204,7 +204,7 @@ dependencies = [
 
 [[package]]
 name = "dotsy"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "ansi_term",
  "dirs 6.0.0",
