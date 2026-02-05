@@ -340,3 +340,46 @@ $ dotsy plugin execute script-handler -- "ls -la"
 ```
 
 This design allows for easy extension and provides a unified interface for all plugin operations.
+
+## Internal Plugin Usage
+
+The plugin system is used internally by existing commands rather than exposing a separate `plugin` CLI subcommand. This keeps the CLI interface consistent while leveraging the plugin architecture behind the scenes.
+
+### How Commands Use Plugins
+
+The existing `profile` and `config` commands use plugin handlers internally:
+
+**Profile Installation** uses:
+- `DirectoryHandlerPlugin` - For creating directories
+- `PackageHandlerPlugin` - For installing packages
+- `ScriptHandlerPlugin` - For running shell scripts
+- Direct handlers for complex link operations
+
+**Profile Uninstallation** uses:
+- `PackageHandlerPlugin` - For uninstalling packages
+- `ScriptHandlerPlugin` - For running cleanup scripts
+- Direct handlers for unlinking files
+
+### Benefits
+
+1. **Consistent CLI**: The user-facing CLI remains unchanged
+2. **Internal Modularity**: Handlers are implemented as plugins
+3. **Easy Testing**: Each plugin can be tested independently
+4. **Future Extensibility**: New handlers can be added as plugins
+5. **Clean Architecture**: Plugin system provides standardized interfaces
+
+### Example Internal Usage
+
+```rust
+// In profile_manager.rs
+let package_handler = PackageHandlerPlugin::new(
+    config.package_add_command.clone(),
+    config.package_remove_command.clone(),
+);
+
+for package in packages {
+    package_handler.install(&package)?;
+}
+```
+
+The plugin system provides the infrastructure, but the existing CLI commands control how and when plugins are used.
