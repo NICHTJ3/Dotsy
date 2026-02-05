@@ -2,7 +2,6 @@
 /// 
 /// The Plugin trait defines the interface for extending Dotsy with custom functionality.
 /// Plugins can be used to add new handlers, processors, or integrations.
-
 use crate::DotsyResult;
 
 /// Core plugin trait that all plugins must implement

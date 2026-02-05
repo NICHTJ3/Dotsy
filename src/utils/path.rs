@@ -4,7 +4,8 @@ use std::path::PathBuf;
 
 /// Convert a path to an absolute path, expanding tildes
 pub fn absolute(base: PathBuf) -> PathBuf {
-    match shellexpand::tilde(&base.into_os_string().to_str().unwrap()) {
+    let path_str = base.to_string_lossy();
+    match shellexpand::tilde(&path_str) {
         std::borrow::Cow::Borrowed(s) => PathBuf::from(s),
         std::borrow::Cow::Owned(s) => PathBuf::from(s),
     }
