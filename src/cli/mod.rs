@@ -1,3 +1,5 @@
+pub mod plugin_commands;
+
 use std::path::PathBuf;
 
 use structopt::{
@@ -23,6 +25,25 @@ pub enum CompletionsSubCommand {
     Bash,
 }
 
+#[derive(Debug, StructOpt)]
+pub enum PluginSubCommand {
+    /// List all available plugins
+    List,
+    /// Show help for a plugin
+    Help {
+        /// Plugin name (optional, shows all if not provided)
+        name: Option<String>,
+    },
+    /// Execute a plugin
+    Execute {
+        /// Plugin name
+        name: String,
+        /// Arguments to pass to the plugin
+        #[structopt(raw = true)]
+        args: Vec<String>,
+    },
+}
+
 impl From<CompletionsSubCommand> for Shell {
     fn from(cmd: CompletionsSubCommand) -> Self {
         match cmd {
@@ -43,6 +64,11 @@ pub enum CliSubcommand {
         config: Option<String>,
         #[structopt(short = "p", long = "profile")]
         profile: Option<String>,
+    },
+    /// Plugin management commands
+    Plugin {
+        #[structopt(subcommand)]
+        cmd: PluginSubCommand,
     },
     Completions(CompletionsSubCommand),
 }

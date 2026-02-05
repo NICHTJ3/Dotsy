@@ -167,9 +167,9 @@ fn install_profile(_profile: String, global_config: &DotsyConfig) {
 }
 
 pub fn load_rcfile() -> DotsyResult<DotsyConfig> {
-    let rcfile_path = defaults::fallback_path().unwrap();
+    let rcfile_path = defaults::fallback_path()?;
 
-    let mut config = configs::DotsyConfig::load(rcfile_path).unwrap();
+    let mut config = configs::DotsyConfig::load(rcfile_path)?;
     config.dotfiles = absolute(config.dotfiles);
 
     Ok(config)
