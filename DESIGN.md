@@ -260,3 +260,83 @@ dir_plugin.install("/home/user/.config")?;
 3. **Testability**: Plugin interface makes testing more straightforward
 4. **Modularity**: Handlers can be composed and swapped dynamically
 5. **Documentation**: Single interface to document and understand
+
+## Plugin Registry and CLI Integration
+
+The plugin system is fully integrated with the CLI through a centralized registry system.
+
+### Plugin Registry
+
+The `PluginRegistry` provides:
+- **Centralized Management**: All plugins are registered in a single location
+- **Thread-Safe Access**: Uses `Arc<RwLock<>>` for safe concurrent access
+- **Discovery**: Plugins can be listed and queried dynamically
+- **Help System**: Each plugin provides its own help information
+
+### CLI Integration
+
+The `plugin` subcommand provides three operations:
+
+1. **List Plugins**
+   ```bash
+   dotsy plugin list
+   ```
+   Shows all registered plugins with their versions and descriptions.
+
+2. **Plugin Help**
+   ```bash
+   dotsy plugin help                    # All plugins
+   dotsy plugin help package-handler    # Specific plugin
+   ```
+   Displays modular help information for plugins.
+
+3. **Execute Plugin**
+   ```bash
+   dotsy plugin execute script-handler -- "echo 'Hello'"
+   dotsy plugin execute directory-handler -- "/path/to/dir"
+   ```
+   Executes a plugin with the provided arguments.
+
+### Built-in Plugins
+
+The registry automatically initializes with these built-in plugins:
+- `package-handler` - Package installation/uninstallation
+- `script-handler` - Shell script execution
+- `directory-handler` - Directory creation
+
+### Modular Help
+
+Each plugin provides its own help information through the `Plugin` trait:
+- `name()` - Plugin identifier
+- `version()` - Version string
+- `description()` - What the plugin does
+
+This creates a modular, discoverable system where new plugins can be added without modifying CLI code.
+
+### Usage Example
+
+```bash
+# Discover available plugins
+$ dotsy plugin list
+Registered Plugins:
+
+  package-handler (v1.0.0)
+    Handles package installation and uninstallation
+
+  script-handler (v1.0.0)
+    Executes shell scripts
+
+  directory-handler (v1.0.0)
+    Creates directories
+
+# Get help for a specific plugin
+$ dotsy plugin help script-handler
+script-handler v1.0.0
+
+Executes shell scripts
+
+# Execute a plugin
+$ dotsy plugin execute script-handler -- "ls -la"
+```
+
+This design allows for easy extension and provides a unified interface for all plugin operations.
