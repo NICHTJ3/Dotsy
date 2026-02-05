@@ -26,6 +26,13 @@ Operations handlers for different types of tasks:
 - `files`: Directory creation
 - `package`: Package installation/uninstallation
 - `script`: Shell script execution
+- `plugin_handlers`: Plugin-based implementations of all handlers
+
+**Plugin Integration**: All handlers are now available as plugins through `plugin_handlers`:
+- `PackageHandlerPlugin`: Package installation/uninstallation
+- `ScriptHandlerPlugin`: Shell script execution
+- `LinkHandlerPlugin`: Symlink operations
+- `DirectoryHandlerPlugin`: Directory creation
 
 ### Utility Modules
 
@@ -75,6 +82,26 @@ Extensibility framework for adding custom functionality:
 - `Plugin` trait: Core plugin interface
 - `HandlerPlugin` trait: For custom handlers
 - `ExamplePlugin`: Reference implementation
+
+**Built-in Plugin Handlers**: All existing handlers implement the plugin interface:
+```rust
+// Use package handler as a plugin
+let plugin = PackageHandlerPlugin::new(
+    "brew install {}".to_string(),
+    "brew uninstall {}".to_string(),
+);
+plugin.install("neovim")?;
+
+// Use script handler as a plugin
+let script_plugin = ScriptHandlerPlugin::new();
+script_plugin.execute(&["echo 'Hello World'".to_string()])?;
+
+// Use directory handler as a plugin
+let dir_plugin = DirectoryHandlerPlugin::new();
+dir_plugin.install("/path/to/directory")?;
+```
+
+This unified interface allows all handlers to be used interchangeably through the plugin system.
 
 ## Design Patterns
 
@@ -176,3 +203,60 @@ CouldntCreateSymLink {
 - Error handling is comprehensive
 - No unwrap() calls in production code paths (except where failure is truly impossible)
 - Consistent naming conventions
+
+## Handler-Plugin Integration
+
+All existing handlers have been migrated to implement the plugin trait interface, providing a unified way to interact with different operations:
+
+### Available Handler Plugins
+
+1. **PackageHandlerPlugin**
+   - Manages package installation/uninstallation
+   - Implements both `Plugin` and `HandlerPlugin` traits
+   - Configurable install/uninstall commands
+
+2. **ScriptHandlerPlugin**
+   - Executes shell scripts
+   - Implements `Plugin` trait
+   - Cross-platform script execution
+
+3. **LinkHandlerPlugin**
+   - Creates and manages symlinks
+   - Implements both `Plugin` and `HandlerPlugin` traits
+   - Supports glob patterns
+
+4. **DirectoryHandlerPlugin**
+   - Creates directories
+   - Implements both `Plugin` and `HandlerPlugin` traits
+   - Preserves existing directories
+
+### Usage Examples
+
+```rust
+use dotsy::handlers::plugin_handlers::*;
+use dotsy::plugins::plugin_trait::{Plugin, HandlerPlugin};
+
+// Package management
+let pkg_plugin = PackageHandlerPlugin::new(
+    "apt install {}".to_string(),
+    "apt remove {}".to_string()
+);
+pkg_plugin.install("vim")?;
+pkg_plugin.uninstall("vim")?;
+
+// Script execution
+let script_plugin = ScriptHandlerPlugin::new();
+script_plugin.execute(&["ls -la".to_string()])?;
+
+// Directory creation
+let dir_plugin = DirectoryHandlerPlugin::new();
+dir_plugin.install("/home/user/.config")?;
+```
+
+### Benefits
+
+1. **Unified Interface**: All handlers follow the same pattern
+2. **Extensibility**: Easy to add new handlers that integrate seamlessly
+3. **Testability**: Plugin interface makes testing more straightforward
+4. **Modularity**: Handlers can be composed and swapped dynamically
+5. **Documentation**: Single interface to document and understand
