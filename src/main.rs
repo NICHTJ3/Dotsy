@@ -1,8 +1,7 @@
 extern crate ansi_term;
 extern crate glob;
 
-use dotsy::cli::plugin_commands;
-use dotsy::cli::{CliSubcommand, PluginSubCommand, ProfileConfigSubCommand::*};
+use dotsy::cli::{CliSubcommand, ProfileConfigSubCommand::*};
 use dotsy::{
     cli::{Cli, CliSubcommand::*},
     commands, dotsy_log_error, DotsyResult,
@@ -57,30 +56,6 @@ fn handle_subcommand(cmd: Option<CliSubcommand>) -> DotsyResult<()> {
                     }
                     List => {
                         commands::config::list(&config);
-                    }
-                }
-            }
-            Plugin { cmd } => {
-                // For plugin commands that don't require full config, provide defaults
-                let config = dotsy::load_rcfile().unwrap_or_else(|_| {
-                    use std::path::PathBuf;
-                    dotsy::configs::DotsyConfig {
-                        dotfiles: PathBuf::from("~/.dotfiles"),
-                        profiles_dir: PathBuf::from("profiles"),
-                        configs_dir: PathBuf::from("configs"),
-                        package_add_command: "echo install {}".to_string(),
-                        package_remove_command: "echo remove {}".to_string(),
-                    }
-                });
-                let registry = plugin_commands::initialize_registry(&config)?;
-
-                match cmd {
-                    PluginSubCommand::List => plugin_commands::list_plugins(&registry)?,
-                    PluginSubCommand::Help { name } => {
-                        plugin_commands::show_plugin_help(&registry, name.as_deref())?
-                    }
-                    PluginSubCommand::Execute { name, args } => {
-                        plugin_commands::execute_plugin(&registry, &name, &args)?
                     }
                 }
             }
