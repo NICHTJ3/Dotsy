@@ -5,6 +5,7 @@ pub mod defaults;
 pub mod error;
 pub mod handlers;
 pub mod macros;
+pub mod profiles;
 pub mod utils;
 
 use ansi_term::Colour::Green;
@@ -120,80 +121,11 @@ fn install_config(config: String, global_config: &DotsyConfig) {
 }
 
 fn uninstall_profile(_profile: String, global_config: &DotsyConfig) {
-    println!(
-        "{message}: {arg}",
-        message = Green.paint("Attempting to uninstall profile"),
-        arg = _profile
-    );
-    let profile = configs::ProfileConfig::load_by_name(&_profile, global_config).unwrap();
-
-    // Unlink files
-    for link in profile.links.unwrap_or_default() {
-        handlers::link::unlink_file(link, global_config)
-            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Uninstall packages
-    for package in profile.packages.unwrap_or_default() {
-        handlers::package::uninstall_package(&package, &global_config.package_remove_command)
-            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Run cleanup scripts
-    for script in profile.revert_shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Uninstall configs
-    for config in profile.configs.unwrap_or_default() {
-        uninstall_config(config, global_config);
-    }
-    println!(
-        "{message}: {arg}",
-        message = Green.paint("Finished uninstalling profile"),
-        arg = _profile
-    );
+    profiles::profile_manager::uninstall(_profile, global_config);
 }
 
 fn install_profile(_profile: String, global_config: &DotsyConfig) {
-    println!(
-        "{message}: {arg}",
-        message = Green.paint("Attempting to install profile"),
-        arg = _profile
-    );
-    let profile = configs::ProfileConfig::load_by_name(&_profile, global_config).unwrap();
-
-    // TODO: Extract this logic
-    // Link files
-    for link in profile.links.unwrap_or_default() {
-        handlers::link::link_file(link, global_config)
-            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Make directories
-    for dir in profile.directories.unwrap_or_default() {
-        handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Install packages
-    for package in profile.packages.unwrap_or_default() {
-        handlers::package::install_package(&package, &global_config.package_add_command)
-            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Run scripts
-    for script in profile.shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
-    // Install configs
-    install_configs(profile.configs.unwrap_or_default(), global_config);
-
-    println!(
-        "{message}: {arg}",
-        message = Green.paint("Finished installing profile"),
-        arg = _profile
-    );
+    profiles::profile_manager::install(_profile, global_config);
 }
 
 pub fn load_rcfile() -> DotsyResult<DotsyConfig> {
