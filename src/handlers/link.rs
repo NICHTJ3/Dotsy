@@ -7,7 +7,9 @@ use crate::{
     configs::{DotsyConfig, Link},
     dotsy_err, dotsy_log_warning,
     error::DotsyError,
-    get_absolute_link, is_symlink, link_exists, DotsyResult,
+    get_absolute_link,
+    utils::path::{is_symlink, link_exists},
+    DotsyResult,
 };
 
 fn link(link: Link) -> DotsyResult<()> {
@@ -42,8 +44,8 @@ fn link(link: Link) -> DotsyResult<()> {
     };
 
     if os::unix::fs::symlink(&from, &to).is_err() {
-        dotsy_err!(DotsyError::CouldntCreateSymLink { 
-            from, 
+        dotsy_err!(DotsyError::CouldntCreateSymLink {
+            from,
             to,
             reason: "Failed to create symlink".to_string()
         });
@@ -114,7 +116,7 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
             .collect()
     } else {
         if !link_exists(&file) {
-            dotsy_err!(DotsyError::Unlink { 
+            dotsy_err!(DotsyError::Unlink {
                 link: file,
                 reason: "Symlink does not exist".to_string()
             });

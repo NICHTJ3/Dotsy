@@ -5,7 +5,7 @@ use crate::{dotsy_err, dotsy_log_error, error::DotsyError, DotsyResult};
 pub fn install_package(package: &str, install_command: &str) -> DotsyResult<()> {
     let command = install_command.replace("{}", package);
     println!("Attempting to install package: {}", package);
-    
+
     // Split the command into parts for proper execution
     let parts: Vec<&str> = command.split_whitespace().collect();
     if parts.is_empty() {
@@ -55,7 +55,7 @@ pub fn install_package(package: &str, install_command: &str) -> DotsyResult<()> 
 pub fn uninstall_package(package: &str, uninstall_command: &str) -> DotsyResult<()> {
     let command = uninstall_command.replace("{}", package);
     println!("Attempting to uninstall package: {}", package);
-    
+
     // Split the command into parts for proper execution
     let parts: Vec<&str> = command.split_whitespace().collect();
     if parts.is_empty() {

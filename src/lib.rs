@@ -5,21 +5,20 @@ pub mod defaults;
 pub mod error;
 pub mod handlers;
 pub mod macros;
+pub mod utils;
 
 use ansi_term::Colour::Green;
-use std::path::PathBuf;
-
-use std::fs;
 
 use configs::{ConfigFile, DotsyConfig, Link};
 use error::DotsyError;
+use utils::path::absolute;
 extern crate shellexpand;
 
 pub type DotsyResult<T, E = DotsyError> = ::std::result::Result<T, E>;
 
 // FIXME: This stuff should be handled better (there is a lot of duplicate logic)
 
-fn get_absolute_link(link: Link, global_config: &DotsyConfig) -> Link {
+pub fn get_absolute_link(link: Link, global_config: &DotsyConfig) -> Link {
     let from = absolute(
         global_config
             .dotfiles
@@ -32,29 +31,6 @@ fn get_absolute_link(link: Link, global_config: &DotsyConfig) -> Link {
         from,
         to,
         glob: link.glob,
-    }
-}
-
-fn link_exists(path: &PathBuf) -> bool {
-    let metadata = fs::symlink_metadata(path);
-    if metadata.is_err() {
-        return false;
-    }
-    true
-}
-
-fn is_symlink(path: &PathBuf) -> bool {
-    let metadata = fs::symlink_metadata(path);
-    if metadata.is_err() {
-        return false;
-    }
-    metadata.unwrap().file_type().is_symlink()
-}
-
-fn absolute(base: PathBuf) -> PathBuf {
-    match shellexpand::tilde(&base.into_os_string().to_str().unwrap()) {
-        std::borrow::Cow::Borrowed(s) => PathBuf::from(s),
-        std::borrow::Cow::Owned(s) => PathBuf::from(s),
     }
 }
 

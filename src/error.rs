@@ -16,7 +16,11 @@ pub enum DotsyError {
         from=from.display(),
         to=to.display()
     ))]
-    CouldntCreateSymLink { from: PathBuf, to: PathBuf, reason: String },
+    CouldntCreateSymLink {
+        from: PathBuf,
+        to: PathBuf,
+        reason: String,
+    },
     #[snafu(display(
         "File or directory already exists at {file}",
         file=file.display()

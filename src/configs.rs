@@ -18,8 +18,8 @@ pub trait ConfigFile {
         Self: Sized,
         for<'de> Self: Deserialize<'de>,
     {
-        let file = File::open(&path).map_err(|_| DotsyError::ConfigNotAvailable { 
-            config: path.clone() 
+        let file = File::open(&path).map_err(|_| DotsyError::ConfigNotAvailable {
+            config: path.clone(),
         })?;
         let reader = BufReader::new(file);
 
