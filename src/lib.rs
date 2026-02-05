@@ -1,3 +1,40 @@
+//! # Dotsy - A Modular Dotfile Manager
+//!
+//! Dotsy is a flexible dotfile manager that helps you manage configurations,
+//! profiles, and system setup through a declarative configuration system.
+//!
+//! ## Architecture
+//!
+//! The codebase is organized into several key modules:
+//!
+//! - **configs**: Configuration file structures and management
+//! - **handlers**: File, package, and script operation handlers
+//! - **profiles**: Profile installation and management
+//! - **utils**: Shared utilities including file management, logging, and builders
+//! - **plugins**: Extensible plugin system for custom functionality
+//!
+//! ## Usage Example
+//!
+//! ```rust,no_run
+//! use dotsy::{load_rcfile, DotsyResult};
+//!
+//! fn main() -> DotsyResult<()> {
+//!     let config = load_rcfile()?;
+//!     // Use the configuration...
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ## Thread Safety
+//!
+//! The current implementation is primarily single-threaded. The plugin system
+//! is designed with `Send + Sync` bounds to support future concurrent execution.
+//!
+//! ## Error Handling
+//!
+//! All operations return `DotsyResult<T>` which uses the Snafu error library
+//! for comprehensive, context-rich error messages.
+
 pub mod cli;
 pub mod commands;
 pub mod configs;
@@ -5,6 +42,7 @@ pub mod defaults;
 pub mod error;
 pub mod handlers;
 pub mod macros;
+pub mod plugins;
 pub mod profiles;
 pub mod utils;
 
