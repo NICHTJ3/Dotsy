@@ -2,7 +2,7 @@
 #[macro_export]
 macro_rules! dotsy_err {
     ($type:expr) => {
-        Err($type)?
+        return Err($type)
     };
 }
 

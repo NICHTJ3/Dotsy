@@ -24,14 +24,15 @@ fn link(link: Link) -> DotsyResult<()> {
     if to.exists()
         && (to.is_file() || to.is_symlink() || (to.is_dir() && !link.glob.unwrap_or_default()))
     {
-        return dotsy_err!(DotsyError::FileAlreadyExists { file: (to) });
+        dotsy_err!(DotsyError::FileAlreadyExists { file: (to) });
     }
 
     // The file, or directory we're trying to link from doesn't exist
     if !from.is_file() && !from.is_dir() {
-        return dotsy_err!(DotsyError::CouldntCreateSymLink {
+        dotsy_err!(DotsyError::CouldntCreateSymLink {
             from: (from),
-            to: (to)
+            to: (to),
+            reason: "Source file or directory does not exist".to_string()
         });
     }
 
@@ -41,7 +42,11 @@ fn link(link: Link) -> DotsyResult<()> {
     };
 
     if os::unix::fs::symlink(&from, &to).is_err() {
-        return dotsy_err!(DotsyError::CouldntCreateSymLink { from, to });
+        dotsy_err!(DotsyError::CouldntCreateSymLink { 
+            from, 
+            to,
+            reason: "Failed to create symlink".to_string()
+        });
     }
 
     Ok(())
@@ -109,7 +114,10 @@ pub fn unlink_file(link_data: Link, global_config: &DotsyConfig) -> DotsyResult<
             .collect()
     } else {
         if !link_exists(&file) {
-            return dotsy_err!(DotsyError::Unlink { link: file });
+            dotsy_err!(DotsyError::Unlink { 
+                link: file,
+                reason: "Symlink does not exist".to_string()
+            });
         }
         vec![file.to_path_buf()]
     };

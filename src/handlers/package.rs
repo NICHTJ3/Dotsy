@@ -9,7 +9,9 @@ pub fn install_package(package: &str, install_command: &str) -> DotsyResult<()> 
     // Split the command into parts for proper execution
     let parts: Vec<&str> = command.split_whitespace().collect();
     if parts.is_empty() {
-        return dotsy_err!(DotsyError::FailedToRunCommand);
+        dotsy_err!(DotsyError::FailedToRunCommand {
+            details: "Package install command is empty".to_string()
+        });
     }
 
     let mut cmd = Command::new(parts[0]);
@@ -23,7 +25,9 @@ pub fn install_package(package: &str, install_command: &str) -> DotsyResult<()> 
             Ok(t) => t,
             Err(e) => {
                 dotsy_log_error!("Failed to spawn command: {}", e);
-                return dotsy_err!(DotsyError::FailedToRunCommand);
+                dotsy_err!(DotsyError::FailedToRunCommand {
+                    details: format!("Failed to spawn package install command: {}", e)
+                });
             }
         }
     };
@@ -32,12 +36,16 @@ pub fn install_package(package: &str, install_command: &str) -> DotsyResult<()> 
         Ok(status) => {
             if !status.success() {
                 dotsy_log_error!("Package installation failed with status: {}", status);
-                return dotsy_err!(DotsyError::FailedToRunCommand);
+                dotsy_err!(DotsyError::FailedToRunCommand {
+                    details: format!("Package installation failed with status: {}", status)
+                });
             }
         }
         Err(e) => {
             dotsy_log_error!("Failed to wait for command: {}", e);
-            return dotsy_err!(DotsyError::FailedToRunCommand);
+            dotsy_err!(DotsyError::FailedToRunCommand {
+                details: format!("Failed to wait for package install command: {}", e)
+            });
         }
     };
 
@@ -51,7 +59,9 @@ pub fn uninstall_package(package: &str, uninstall_command: &str) -> DotsyResult<
     // Split the command into parts for proper execution
     let parts: Vec<&str> = command.split_whitespace().collect();
     if parts.is_empty() {
-        return dotsy_err!(DotsyError::FailedToRunCommand);
+        dotsy_err!(DotsyError::FailedToRunCommand {
+            details: "Package uninstall command is empty".to_string()
+        });
     }
 
     let mut cmd = Command::new(parts[0]);
@@ -65,7 +75,9 @@ pub fn uninstall_package(package: &str, uninstall_command: &str) -> DotsyResult<
             Ok(t) => t,
             Err(e) => {
                 dotsy_log_error!("Failed to spawn command: {}", e);
-                return dotsy_err!(DotsyError::FailedToRunCommand);
+                dotsy_err!(DotsyError::FailedToRunCommand {
+                    details: format!("Failed to spawn package uninstall command: {}", e)
+                });
             }
         }
     };
@@ -74,12 +86,16 @@ pub fn uninstall_package(package: &str, uninstall_command: &str) -> DotsyResult<
         Ok(status) => {
             if !status.success() {
                 dotsy_log_error!("Package uninstallation failed with status: {}", status);
-                return dotsy_err!(DotsyError::FailedToRunCommand);
+                dotsy_err!(DotsyError::FailedToRunCommand {
+                    details: format!("Package uninstallation failed with status: {}", status)
+                });
             }
         }
         Err(e) => {
             dotsy_log_error!("Failed to wait for command: {}", e);
-            return dotsy_err!(DotsyError::FailedToRunCommand);
+            dotsy_err!(DotsyError::FailedToRunCommand {
+                details: format!("Failed to wait for package uninstall command: {}", e)
+            });
         }
     };
 

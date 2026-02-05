@@ -6,7 +6,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::{dotsy_err, error::DotsyError, DotsyResult};
+use crate::{error::DotsyError, DotsyResult};
 
 // TODO: Do this stuff better
 // - A lot of the config/profile functionallity is shared (should it be a trait?)
@@ -18,13 +18,9 @@ pub trait ConfigFile {
         Self: Sized,
         for<'de> Self: Deserialize<'de>,
     {
-        let file = {
-            let this = File::open(&path);
-            match this {
-                Ok(t) => t,
-                Err(..) => return dotsy_err!(DotsyError::ConfigNotAvailable { config: (path) }),
-            }
-        };
+        let file = File::open(&path).map_err(|_| DotsyError::ConfigNotAvailable { 
+            config: path.clone() 
+        })?;
         let reader = BufReader::new(file);
 
         let v: Self = serde_json::from_reader(reader).unwrap();

@@ -13,16 +13,20 @@ pub fn run_script(script: &str) -> DotsyResult<()> {
         let this = command.stdout(Stdio::inherit()).spawn();
         match this {
             Ok(t) => t,
-            Err(..) => {
-                return dotsy_err!(DotsyError::FailedToRunCommand)
+            Err(e) => {
+                dotsy_err!(DotsyError::FailedToRunCommand {
+                    details: format!("Failed to spawn script command: {}", e)
+                });
             }
         }
     };
 
     match command.wait() {
         Ok(t) => t,
-        Err(..) => {
-            return dotsy_err!(DotsyError::FailedToRunCommand)
+        Err(e) => {
+            dotsy_err!(DotsyError::FailedToRunCommand {
+                details: format!("Failed to wait for script command: {}", e)
+            });
         }
     };
 

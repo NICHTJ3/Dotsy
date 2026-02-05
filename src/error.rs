@@ -3,25 +3,29 @@ use std::path::PathBuf;
 
 #[derive(Snafu, Debug)]
 pub enum DotsyError {
-    #[snafu(display("I need an error message for this case"))]
-    TODO,
-    #[snafu(display("Failed to run shell command"))]
-    FailedToRunCommand,
-    #[snafu(display("Failed to unlink symlink {link}",link=link.display()))]
-    Unlink { link: PathBuf },
-    #[snafu(display("config was not found for {config_name}",config_name=config.display()))]
+    #[snafu(display("Failed to run shell command: {details}"))]
+    FailedToRunCommand { details: String },
+    #[snafu(display("Failed to unlink symlink at {link}: {reason}",link=link.display()))]
+    Unlink { link: PathBuf, reason: String },
+    #[snafu(display("Configuration file not found at {config_name}",config_name=config.display()))]
     ConfigNotAvailable { config: PathBuf },
-    #[snafu(display("config file was not found"))]
+    #[snafu(display("No configuration file found in expected locations"))]
     NoConfigFile,
     #[snafu(display(
-        "we had some trouble linking files please check these paths: {from}, {to}",
+        "Failed to create symlink from {from} to {to}: {reason}",
         from=from.display(),
         to=to.display()
     ))]
-    CouldntCreateSymLink { from: PathBuf, to: PathBuf },
+    CouldntCreateSymLink { from: PathBuf, to: PathBuf, reason: String },
     #[snafu(display(
-        "we had some trouble creating the file or directory please check this path doesn't already exist: {file}",
+        "File or directory already exists at {file}",
         file=file.display()
     ))]
     FileAlreadyExists { file: PathBuf },
+    #[snafu(display("I/O error: {details}"))]
+    IoError { details: String },
+    #[snafu(display("JSON parsing error: {details}"))]
+    JsonError { details: String },
+    #[snafu(display("Invalid configuration: {details}"))]
+    InvalidConfig { details: String },
 }
