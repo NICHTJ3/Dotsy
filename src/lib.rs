@@ -91,6 +91,12 @@ fn uninstall_config(config: String, global_config: &DotsyConfig) {
             .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
+    // Uninstall packages
+    for package in config.packages.unwrap_or_default() {
+        handlers::package::uninstall_package(&package, &global_config.package_remove_command)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
+    }
+
     // Run cleanup scripts
     for script in config.revert_shell.unwrap_or_default() {
         handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
@@ -120,14 +126,20 @@ fn install_config(config: String, global_config: &DotsyConfig) {
             .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
-    // Run scripts
-    for script in config.shell.unwrap_or_default() {
-        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
-    }
-
     // Make directories
     for dir in config.directories.unwrap_or_default() {
         handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| dotsy_log_error!("{}", e));
+    }
+
+    // Install packages
+    for package in config.packages.unwrap_or_default() {
+        handlers::package::install_package(&package, &global_config.package_add_command)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
+    }
+
+    // Run scripts
+    for script in config.shell.unwrap_or_default() {
+        handlers::script::run_script(&script).unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 }
 
@@ -142,6 +154,12 @@ fn uninstall_profile(_profile: String, global_config: &DotsyConfig) {
     // Unlink files
     for link in profile.links.unwrap_or_default() {
         handlers::link::unlink_file(link, global_config)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
+    }
+
+    // Uninstall packages
+    for package in profile.packages.unwrap_or_default() {
+        handlers::package::uninstall_package(&package, &global_config.package_remove_command)
             .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
@@ -179,6 +197,12 @@ fn install_profile(_profile: String, global_config: &DotsyConfig) {
     // Make directories
     for dir in profile.directories.unwrap_or_default() {
         handlers::files::create_dir(absolute(dir)).unwrap_or_else(|e| dotsy_log_error!("{}", e));
+    }
+
+    // Install packages
+    for package in profile.packages.unwrap_or_default() {
+        handlers::package::install_package(&package, &global_config.package_add_command)
+            .unwrap_or_else(|e| dotsy_log_error!("{}", e));
     }
 
     // Run scripts
