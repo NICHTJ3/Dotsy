@@ -5,6 +5,7 @@ pub mod defaults;
 pub mod error;
 pub mod handlers;
 pub mod macros;
+pub mod shell;
 
 use ansi_term::Colour::Green;
 use std::path::PathBuf;
